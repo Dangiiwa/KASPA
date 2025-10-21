@@ -104,30 +104,21 @@ const CustomMapControls: React.FC<CustomMapControlsProps> = ({ className }) => {
     <>
       {/* Zoom Controls */}
       <Box 
-        className={`map-control-zoom ${className || ''}`}
+        className={`map-control map-control-zoom ${className || ''}`}
         sx={{
           position: 'absolute',
-          bottom: 20,
-          right: 20,
+          bottom: 16,
+          right: 16,
           zIndex: 1000,
-          display: 'inline-flex',
+          display: 'flex',
           flexDirection: 'row',
           gap: 0,
           padding: 0,
-          width: 'fit-content',
-          background: 'rgba(255, 255, 255, 0.96)',
-          backdropFilter: 'blur(16px) saturate(180%)',
-          WebkitBackdropFilter: 'blur(16px) saturate(180%)',
-          boxShadow: '0 6px 20px rgba(0, 0, 0, 0.08), 0 2px 6px rgba(0, 0, 0, 0.04), inset 0 1px 0 rgba(255, 255, 255, 0.9)',
-          borderRadius: '10px',
-          border: '1px solid rgba(226, 232, 240, 0.6)',
+          background: '#ffffff',
+          boxShadow: '0 2px 8px rgba(0, 0, 0, 0.08)',
+          borderRadius: '8px',
+          border: '1px solid rgba(0, 0, 0, 0.08)',
           overflow: 'hidden',
-          transition: 'all 200ms ease-in-out',
-          '&:hover': {
-            background: 'rgba(255, 255, 255, 0.98)',
-            boxShadow: '0 8px 28px rgba(0, 0, 0, 0.12), 0 3px 8px rgba(0, 0, 0, 0.06), inset 0 1px 0 rgba(255, 255, 255, 0.95)',
-            transform: 'translateY(-2px)'
-          }
         }}
       >
         <Tooltip title="Zoom in" placement="left">
@@ -137,20 +128,12 @@ const CustomMapControls: React.FC<CustomMapControlsProps> = ({ className }) => {
             sx={{ 
               color: '#64748b',
               borderRadius: 0,
-              padding: '8px',
-              minWidth: '36px',
-              height: '36px',
-              transition: 'all 200ms ease-in-out',
+              padding: '6px',
               '&:hover': {
-                backgroundColor: '#f1f5f9',
-                color: '#1e293b',
-                transform: 'scale(1.05)'
+                backgroundColor: '#f8f9fa',
+                color: '#0f172a'
               },
-              '&:active': {
-                transform: 'scale(0.95)',
-                backgroundColor: '#e2e8f0'
-              },
-              borderRight: '1px solid rgba(226, 232, 240, 0.5)',
+              borderRight: '1px solid rgba(0, 0, 0, 0.08)',
             }}
           >
             <Add fontSize="small" />
@@ -164,20 +147,12 @@ const CustomMapControls: React.FC<CustomMapControlsProps> = ({ className }) => {
             sx={{ 
               color: '#64748b',
               borderRadius: 0,
-              padding: '8px',
-              minWidth: '36px',
-              height: '36px',
-              transition: 'all 200ms ease-in-out',
+              padding: '6px',
               '&:hover': {
-                backgroundColor: '#f1f5f9',
-                color: '#1e293b',
-                transform: 'scale(1.05)'
+                backgroundColor: '#f8f9fa',
+                color: '#0f172a'
               },
-              '&:active': {
-                transform: 'scale(0.95)',
-                backgroundColor: '#e2e8f0'
-              },
-              borderRight: '1px solid rgba(226, 232, 240, 0.5)',
+              borderRight: '1px solid rgba(0, 0, 0, 0.08)',
             }}
           >
             <Remove fontSize="small" />
@@ -191,19 +166,11 @@ const CustomMapControls: React.FC<CustomMapControlsProps> = ({ className }) => {
             sx={{ 
               color: '#64748b',
               borderRadius: 0,
-              padding: '8px',
-              minWidth: '36px',
-              height: '36px',
-              transition: 'all 200ms ease-in-out',
+              padding: '6px',
               '&:hover': {
-                backgroundColor: '#f1f5f9',
-                color: '#1e293b',
-                transform: 'scale(1.05)'
+                backgroundColor: '#f8f9fa',
+                color: '#0f172a'
               },
-              '&:active': {
-                transform: 'scale(0.95)',
-                backgroundColor: '#e2e8f0'
-              }
             }}
           >
             {isFullscreen ? <FullscreenExit fontSize="small" /> : <Fullscreen fontSize="small" />}

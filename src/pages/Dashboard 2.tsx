@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React from 'react';
 import { 
   AppBar, 
   Toolbar, 
@@ -14,37 +14,24 @@ import {
 import { useAppSelector, useAppDispatch } from '../redux/hooks';
 import { Agriculture } from '@mui/icons-material';
 import { logout } from '../redux/slices/userSlice';
-import { createFarm, clearCreateError } from '../redux/slices/fieldsSlice';
 import { useFields } from '../hooks/useFields';
 import Map from '../components/map/Map';
 import WeatherSidebar from '../components/weather/WeatherSidebar';
-import AddFarmSidebar from '../components/forms/AddFarmSidebar';
-import type { Field, GeoJSON } from '../types';
-import { useSnackbar } from 'notistack';
+import type { Field } from '../types';
 
 const Dashboard: React.FC = () => {
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down('md'));
   const dispatch = useAppDispatch();
-  const { enqueueSnackbar } = useSnackbar();
   const { userData } = useAppSelector((state) => state.user);
-  const { creating, createError } = useAppSelector((state) => state.fields);
   const { 
     fields, 
     loading, 
     selectedField, 
     selectField, 
     isTransitioning, 
-    autoSelecting,
-    fetchFields
+    autoSelecting 
   } = useFields(true); // Enable auto-selection
-
-  // Farm creation state
-  const [isCreatingFarm, setIsCreatingFarm] = useState(false);
-  const [isDrawingMode, setIsDrawingMode] = useState(false);
-  const [drawnPolygon, setDrawnPolygon] = useState<GeoJSON | null>(null);
-  const [polygonArea, setPolygonArea] = useState<number | null>(null);
-  const [previousSelectedField, setPreviousSelectedField] = useState<Field | null>(null);
 
   const handleLogout = () => {
     dispatch(logout());
@@ -52,68 +39,6 @@ const Dashboard: React.FC = () => {
 
   const handleFieldSelect = (field: Field) => {
     selectField(field);
-  };
-
-  // Farm creation handlers
-  const handleAddFarmClick = () => {
-    console.log('handleAddFarmClick called - enabling farm creation mode');
-    
-    // Store current selected field to restore later if cancelled
-    setPreviousSelectedField(selectedField);
-    
-    // Clear selected field to hide old polygon
-    selectField(null);
-    
-    setIsCreatingFarm(true);
-    setIsDrawingMode(true); // ✅ CRITICAL FIX: Enable drawing mode!
-  };
-
-  const handleAddFarmCancel = () => {
-    setIsCreatingFarm(false);
-    setIsDrawingMode(false);
-    setDrawnPolygon(null);
-    setPolygonArea(null);
-    dispatch(clearCreateError());
-    
-    // Restore previous selected field if user cancels
-    if (previousSelectedField) {
-      selectField(previousSelectedField);
-      setPreviousSelectedField(null);
-    }
-  };
-
-  const handlePolygonDrawn = (geoJson: GeoJSON, area: number) => {
-    setDrawnPolygon(geoJson);
-    setPolygonArea(area);
-  };
-
-  const handlePolygonCleared = () => {
-    setDrawnPolygon(null);
-    setPolygonArea(null);
-  };
-
-  const handleDrawingModeChange = (isDrawing: boolean) => {
-    setIsDrawingMode(isDrawing);
-  };
-
-  const handleCreateFarm = async (farmData: { name: string; field_status: 'unplanted' | 'active'; geo_json: GeoJSON }) => {
-    try {
-      await dispatch(createFarm(farmData)).unwrap();
-      enqueueSnackbar('Farm created successfully!', { variant: 'success' });
-      
-      // Reset creation state
-      setIsCreatingFarm(false);
-      setIsDrawingMode(false);
-      setDrawnPolygon(null);
-      setPolygonArea(null);
-      setPreviousSelectedField(null);
-      dispatch(clearCreateError());
-      
-      // Refresh fields list to include the new farm
-      fetchFields();
-    } catch (error: any) {
-      enqueueSnackbar(error || 'Failed to create farm', { variant: 'error' });
-    }
   };
 
   // Determine if we should show loading overlay
@@ -271,17 +196,10 @@ const Dashboard: React.FC = () => {
             loading={loading}
             isTransitioning={isTransitioning}
             autoSelecting={autoSelecting}
-            isDrawingMode={isDrawingMode}
-            onDrawingModeChange={handleDrawingModeChange}
-            onPolygonDrawn={handlePolygonDrawn}
-            onPolygonCleared={handlePolygonCleared}
-            showSearchBar={isDrawingMode}
-            onAddFarm={handleAddFarmClick}
-            isCreatingFarm={isCreatingFarm}
           />
         </Box>
 
-        {/* Right Side - Dynamic Sidebar */}
+        {/* Right Side - Weather Cards Sidebar */}
         <Box sx={{ 
           flex: isMobile ? '1 1 50%' : '0 0 35%',
           backgroundColor: '#f8fafc',
@@ -289,18 +207,7 @@ const Dashboard: React.FC = () => {
           borderTop: isMobile ? '1px solid #e2e8f0' : 'none',
           overflow: 'hidden'
         }}>
-          {isCreatingFarm ? (
-            <AddFarmSidebar
-              onSubmit={handleCreateFarm}
-              onCancel={handleAddFarmCancel}
-              loading={creating}
-              error={createError}
-              drawnPolygon={drawnPolygon}
-              polygonArea={polygonArea ?? undefined}
-            />
-          ) : (
-            <WeatherSidebar selectedField={selectedField} />
-          )}
+          <WeatherSidebar selectedField={selectedField} />
         </Box>
       </Box>
 
@@ -329,7 +236,6 @@ const Dashboard: React.FC = () => {
           </Box>
         </Fade>
       </Backdrop>
-
     </Box>
   );
 };

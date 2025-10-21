@@ -46,7 +46,7 @@ export interface SatelliteState {
 
 const initialState: SatelliteState = {
   isVisible: true,
-  opacity: 0.7,
+  opacity: 1.0,
   selectedDate: null,
   selectedType: 'ndvi',
   currentField: null,

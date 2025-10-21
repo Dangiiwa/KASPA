@@ -510,17 +510,27 @@
 
 /* Professional Map Control Variants */
 .map-control-compact {
-  padding: 12px 16px;
-  min-width: 280px;
-  border-radius: 6px;
-  border: 1px solid rgba(226, 232, 240, 0.8);
-  background: rgba(255, 255, 255, 0.95);
-  backdrop-filter: blur(12px);
-  -webkit-backdrop-filter: blur(12px);
+  padding: 16px 20px;
+  min-width: 320px;
+  border-radius: 8px;
+  border: 1px solid rgba(226, 232, 240, 0.6);
+  background: rgba(255, 255, 255, 0.96);
+  backdrop-filter: blur(16px) saturate(180%);
+  -webkit-backdrop-filter: blur(16px) saturate(180%);
   box-shadow: 
-    0 4px 16px rgba(0, 0, 0, 0.08),
-    0 1px 3px rgba(0, 0, 0, 0.04),
-    inset 0 1px 0 rgba(255, 255, 255, 0.8);
+    0 6px 20px rgba(0, 0, 0, 0.08),
+    0 2px 6px rgba(0, 0, 0, 0.04),
+    inset 0 1px 0 rgba(255, 255, 255, 0.9);
+  transition: all 200ms ease-in-out;
+}
+
+.map-control-compact:hover {
+  background: rgba(255, 255, 255, 0.98);
+  box-shadow: 
+    0 8px 28px rgba(0, 0, 0, 0.12),
+    0 3px 8px rgba(0, 0, 0, 0.06),
+    inset 0 1px 0 rgba(255, 255, 255, 0.95);
+  transform: translateY(-1px);
 }
 
 .map-control-expanded {
@@ -550,20 +560,25 @@
   display: flex;
   align-items: center;
   justify-content: space-between;
-  margin-bottom: 12px;
-  padding-bottom: 10px;
-  border-bottom: 1px solid #e2e8f0;
+  margin-bottom: 16px;
+  padding-bottom: 12px;
+  border-bottom: 1px solid rgba(226, 232, 240, 0.6);
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.1) 0%, rgba(255, 255, 255, 0.05) 100%);
+  margin: -16px -20px 16px -20px;
+  padding: 12px 20px;
+  border-radius: 8px 8px 0 0;
 }
 
 .map-control-title {
-  font-size: 13px;
-  font-weight: 600;
+  font-size: 14px;
+  font-weight: 700;
   color: #1e293b;
   margin: 0;
   display: flex;
   align-items: center;
-  gap: 8px;
-  letter-spacing: 0.25px;
+  gap: 10px;
+  letter-spacing: 0.5px;
+  text-shadow: 0 1px 2px rgba(255, 255, 255, 0.8);
 }
 
 .map-control-subtitle {
@@ -629,10 +644,14 @@
 /* Fix dropdown menu styling for light mode */
 .map-control .MuiMenu-paper,
 .MuiMenu-paper[data-popper-placement] {
-  background-color: var(--surface-primary) !important;
+  background: rgba(255, 255, 255, 0.96) !important;
+  backdrop-filter: blur(16px) saturate(180%) !important;
+  -webkit-backdrop-filter: blur(16px) saturate(180%) !important;
   color: var(--text-primary) !important;
-  border: 1px solid var(--surface-border);
-  box-shadow: var(--shadow-lg);
+  border: 1px solid rgba(226, 232, 240, 0.6) !important;
+  border-radius: 12px !important;
+  box-shadow: 0 8px 28px rgba(0, 0, 0, 0.12), 0 3px 8px rgba(0, 0, 0, 0.06), inset 0 1px 0 rgba(255, 255, 255, 0.9) !important;
+  margin-top: 8px !important;
 }
 
 .map-control .MuiMenuItem-root,

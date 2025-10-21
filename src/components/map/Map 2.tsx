@@ -1,17 +1,15 @@
 import React, { useEffect, useState, useRef } from 'react';
 import { MapContainer, TileLayer, Polygon, Popup, useMap } from 'react-leaflet';
 import L from 'leaflet';
+import 'leaflet-draw';
 import { Box } from '@mui/material';
 import { useAppSelector } from '../../redux/hooks';
-import type { Field, GeoJSON } from '../../types';
+import type { Field } from '../../types';
 import { useMapTransitions } from '../../hooks/useMapTransitions';
 import NDVIOverlay from './NDVIOverlay';
 import NDVIControls from './NDVIControls';
 import CustomMapControls from './CustomMapControls';
 import MapControls from './MapControls';
-import LeafletDrawControls from './LeafletDrawControls';
-import SearchBar from './SearchBar';
-import type { SearchResult } from './SearchBar';
 
 // Fix default markers
 delete (L.Icon.Default.prototype as any)._getIconUrl;
@@ -30,24 +28,7 @@ interface MapProps {
   loading?: boolean;
   isTransitioning?: boolean;
   autoSelecting?: boolean;
-  // Drawing mode props
-  isDrawingMode?: boolean;
-  onDrawingModeChange?: (isDrawing: boolean) => void;
-  onPolygonDrawn?: (geoJson: GeoJSON, area: number) => void;
-  onPolygonCleared?: () => void;
-  showSearchBar?: boolean;
-  onAddFarm?: () => void;
-  isCreatingFarm?: boolean;
 }
-
-// Component to handle map reference
-const MapRefHandler: React.FC<{ onMapReady: (map: L.Map) => void }> = ({ onMapReady }) => {
-  const map = useMap();
-  useEffect(() => {
-    onMapReady(map);
-  }, [map, onMapReady]);
-  return null;
-};
 
 const MapController: React.FC<{ 
   fields: Field[]; 
@@ -142,38 +123,16 @@ const Map: React.FC<MapProps> = ({
   showSatellite = true,
   loading = false,
   isTransitioning = false,
-  autoSelecting = false,
-  isDrawingMode = false,
-  onDrawingModeChange,
-  onPolygonDrawn,
-  onPolygonCleared,
-  showSearchBar = false,
-  onAddFarm,
-  isCreatingFarm = false
+  autoSelecting = false
 }) => {
-  const [center, setCenter] = useState<[number, number]>([6.5244, 3.3792]); // Lagos, Nigeria as default
-  const [zoom, setZoom] = useState(10);
-  const mapRef = useRef<L.Map | null>(null);
+  const [center] = useState<[number, number]>([6.5244, 3.3792]); // Lagos, Nigeria as default
+  const [zoom] = useState(10);
 
   const getPolygonColor = (field: Field) => {
     if (selectedField?.id === field.id) {
       return '#2E7D32'; // Green for selected
     }
     return field.field_status === 'active' ? '#4CAF50' : '#FFC107'; // Different colors for status
-  };
-
-  const handleLocationSelect = (result: SearchResult) => {
-    if (mapRef.current) {
-      const bounds = L.latLngBounds(result.bounds);
-      mapRef.current.fitBounds(bounds, {
-        padding: [20, 20],
-        maxZoom: 18
-      });
-    }
-  };
-
-  const handleMapReady = (map: L.Map) => {
-    mapRef.current = map;
   };
 
   return (
@@ -196,27 +155,15 @@ const Map: React.FC<MapProps> = ({
           />
         )}
 
-        <MapRefHandler onMapReady={handleMapReady} />
         <MapController fields={fields} selectedField={selectedField} />
         
-        {/* NDVI Overlay - only show when not creating farm */}
-        {!isCreatingFarm && <NDVIOverlay fieldId={selectedField?.id} />}
+        {/* NDVI Overlay */}
+        <NDVIOverlay fieldId={selectedField?.id} />
 
         {/* Custom Map Controls */}
         <CustomMapControls />
 
-        {/* Leaflet Draw Controls */}
-        {onDrawingModeChange && onPolygonDrawn && onPolygonCleared && (
-          <LeafletDrawControls
-            isDrawingMode={isDrawingMode}
-            onDrawingModeChange={onDrawingModeChange}
-            onPolygonDrawn={onPolygonDrawn}
-            onPolygonCleared={onPolygonCleared}
-          />
-        )}
-
-        {/* Existing Farm Polygons - only show when not creating farm */}
-        {!isCreatingFarm && fields.map((field) => {
+        {fields.map((field) => {
           const coordinates = field.geo_json.geometry.coordinates[0];
           const positions: [number, number][] = coordinates.map(coord => [coord[1], coord[0]]);
 
@@ -258,27 +205,10 @@ const Map: React.FC<MapProps> = ({
         loading={loading}
         isTransitioning={isTransitioning}
         autoSelecting={autoSelecting}
-        onAddFarm={onAddFarm}
-        isCreatingFarm={isCreatingFarm}
       />
       
-      {/* Search Bar */}
-      {showSearchBar && (
-        <Box
-          sx={{
-            position: 'absolute',
-            top: 20,
-            right: 20,
-            zIndex: 1000,
-            width: '300px',
-          }}
-        >
-          <SearchBar onLocationSelect={handleLocationSelect} />
-        </Box>
-      )}
-      
-      {/* NDVI Controls - positioned outside MapContainer for proper overlay, hide when creating farm */}
-      {!isCreatingFarm && <NDVIControls fieldId={selectedField?.id} />}
+      {/* NDVI Controls - positioned outside MapContainer for proper overlay */}
+      <NDVIControls fieldId={selectedField?.id} />
     </Box>
   );
 };

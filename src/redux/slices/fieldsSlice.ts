@@ -1,5 +1,6 @@
-import { createSlice, type PayloadAction } from '@reduxjs/toolkit';
-import type { Field } from '../../types';
+import { createSlice, createAsyncThunk, type PayloadAction } from '@reduxjs/toolkit';
+import type { Field, createPolygonsPayload } from '../../types';
+import { createPolygon } from '../../services/geo';
 
 interface FieldsState {
   data: Field[];
@@ -8,6 +9,8 @@ interface FieldsState {
   isTransitioning: boolean;
   autoSelecting: boolean;
   lastSelectedFieldId: string | null;
+  creating: boolean;
+  createError: string | null;
 }
 
 const initialState: FieldsState = {
@@ -17,7 +20,22 @@ const initialState: FieldsState = {
   isTransitioning: false,
   autoSelecting: false,
   lastSelectedFieldId: null,
+  creating: false,
+  createError: null,
 };
+
+// Async thunk for creating a new farm/polygon
+export const createFarm = createAsyncThunk(
+  'fields/createFarm',
+  async (farmData: createPolygonsPayload, { rejectWithValue }) => {
+    try {
+      const response = await createPolygon(farmData);
+      return response;
+    } catch (error: any) {
+      return rejectWithValue(error.message || 'Failed to create farm');
+    }
+  }
+);
 
 const fieldsSlice = createSlice({
   name: 'fields',
@@ -64,6 +82,26 @@ const fieldsSlice = createSlice({
       state.isTransitioning = false;
       state.autoSelecting = false;
     },
+    clearCreateError: (state) => {
+      state.createError = null;
+    },
+  },
+  extraReducers: (builder) => {
+    builder
+      .addCase(createFarm.pending, (state) => {
+        state.creating = true;
+        state.createError = null;
+      })
+      .addCase(createFarm.fulfilled, (state, action) => {
+        state.creating = false;
+        state.createError = null;
+        // Note: The actual field data will be added when we refresh the fields list
+        // or we could add it directly if the API returns the created field
+      })
+      .addCase(createFarm.rejected, (state, action) => {
+        state.creating = false;
+        state.createError = action.payload as string;
+      });
   },
 });
 
@@ -77,7 +115,8 @@ export const {
   setTransitioning,
   setAutoSelecting,
   selectFirstField,
-  clearSelection
+  clearSelection,
+  clearCreateError
 } = fieldsSlice.actions;
 
 export default fieldsSlice.reducer;
