@@ -43,7 +43,7 @@ const NDVIControls: React.FC<NDVIControlsProps> = ({ fieldId }) => {
   const opacity = useAppSelector(selectOverlayOpacity);
   const currentImage = useAppSelector(selectCurrentImage);
   
-  const [isExpanded, setIsExpanded] = useState(false);
+  const [isExpanded, setIsExpanded] = useState(true); // Default to expanded for better visibility
 
   const { availableImages, selectedDate, selectedType, loading } = satelliteState;
 

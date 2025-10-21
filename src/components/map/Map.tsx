@@ -206,14 +206,28 @@ const Map: React.FC<MapProps> = ({
         <CustomMapControls />
 
         {/* Leaflet Draw Controls */}
-        {onDrawingModeChange && onPolygonDrawn && onPolygonCleared && (
-          <LeafletDrawControls
-            isDrawingMode={isDrawingMode}
-            onDrawingModeChange={onDrawingModeChange}
-            onPolygonDrawn={onPolygonDrawn}
-            onPolygonCleared={onPolygonCleared}
-          />
-        )}
+        {(() => {
+          const hasCallbacks = !!(onDrawingModeChange && onPolygonDrawn && onPolygonCleared);
+          console.log('🔍 Map.tsx - LeafletDrawControls conditional check:', {
+            isDrawingMode,
+            onDrawingModeChange: !!onDrawingModeChange,
+            onPolygonDrawn: !!onPolygonDrawn, 
+            onPolygonCleared: !!onPolygonCleared,
+            hasCallbacks,
+            shouldRender: hasCallbacks
+          });
+          
+          return hasCallbacks ? (
+            <LeafletDrawControls
+              isDrawingMode={isDrawingMode}
+              onDrawingModeChange={onDrawingModeChange}
+              onPolygonDrawn={onPolygonDrawn}
+              onPolygonCleared={onPolygonCleared}
+            />
+          ) : (
+            <div>⚠️ LeafletDrawControls NOT RENDERING - Missing callbacks</div>
+          );
+        })()}
 
         {/* Existing Farm Polygons - only show when not creating farm */}
         {!isCreatingFarm && fields.map((field) => {

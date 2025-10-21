@@ -61,7 +61,7 @@ const initialState: SatelliteState = {
   colorScale: {
     min: 0,
     max: 1,
-    palette: ['#d73027', '#f46d43', '#fdae61', '#fee08b', '#d9ef8b', '#a6d96a', '#66bd63', '#1a9850']
+    palette: ['#8B0000', '#FF0000', '#FF4500', '#FFA500', '#FFD700', '#ADFF2F', '#32CD32', '#006400'] // Enhanced vibrant colors: dark red to dark green
   }
 };
 

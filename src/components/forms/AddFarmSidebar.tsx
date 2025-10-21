@@ -28,6 +28,15 @@ interface AddFarmSidebarProps {
   polygonArea?: number;
 }
 
+// Add logging helper for debugging
+const logStateChange = (label: string, drawnPolygon: GeoJSON | null | undefined, loading: boolean | undefined) => {
+  console.log(`📊 ${label}:`, {
+    hasPolygon: !!drawnPolygon,
+    loading: !!loading,
+    buttonShouldBeEnabled: !loading && !!drawnPolygon
+  });
+};
+
 const validationSchema = Yup.object({
   name: Yup.string()
     .required('Farm name is required')
@@ -47,6 +56,14 @@ const AddFarmSidebar: React.FC<AddFarmSidebarProps> = ({
   polygonArea
 }) => {
   const [localError, setLocalError] = useState<string | null>(null);
+  
+  // Log state changes for debugging
+  useEffect(() => {
+    logStateChange('AddFarmSidebar render', drawnPolygon, loading);
+  }, [drawnPolygon, loading]);
+  
+  // Debug logging to check if drawnPolygon is being received
+  console.log('🔍 AddFarmSidebar - drawnPolygon:', drawnPolygon, 'polygonArea:', polygonArea);
 
   const formik = useFormik({
     initialValues: {
@@ -55,18 +72,32 @@ const AddFarmSidebar: React.FC<AddFarmSidebarProps> = ({
     },
     validationSchema,
     onSubmit: (values) => {
+      console.log('🚀 FORM SUBMISSION STARTED');
+      console.log('📝 Form values:', values);
+      console.log('🗺️ Polygon state check:', {
+        drawnPolygon: drawnPolygon,
+        hasPolygon: !!drawnPolygon,
+        polygonType: typeof drawnPolygon,
+        polygonArea: polygonArea
+      });
+      
       setLocalError(null);
       
       if (!drawnPolygon) {
+        console.log('❌ VALIDATION FAILED: No polygon drawn');
         setLocalError('Please draw a polygon on the map before saving');
         return;
       }
 
-      onSubmit({
+      console.log('✅ VALIDATION PASSED: Submitting farm data');
+      const farmData = {
         name: values.name,
         field_status: values.field_status,
         geo_json: drawnPolygon
-      });
+      };
+      console.log('📤 Submitting farm data:', farmData);
+      
+      onSubmit(farmData);
     },
   });
 
@@ -296,8 +327,11 @@ const AddFarmSidebar: React.FC<AddFarmSidebarProps> = ({
           Cancel
         </Button>
         <Button
-          onClick={() => formik.handleSubmit()}
-          disabled={loading || !drawnPolygon}
+          onClick={() => {
+            console.log('🔥 Create Farm button clicked! drawnPolygon:', !!drawnPolygon, 'loading:', loading);
+            formik.handleSubmit();
+          }}
+          disabled={loading}
           variant="contained"
           fullWidth
           sx={{

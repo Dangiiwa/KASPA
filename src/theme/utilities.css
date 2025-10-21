@@ -756,3 +756,13 @@
     font-size: 13px;
   }
 }
+
+/* NDVI Overlay Enhancement */
+.ndvi-overlay-enhanced {
+  filter: brightness(1.05) contrast(1.15) saturate(1.2);
+  transition: filter 0.3s ease;
+}
+
+.ndvi-overlay-enhanced:hover {
+  filter: brightness(1.1) contrast(1.2) saturate(1.25);
+}

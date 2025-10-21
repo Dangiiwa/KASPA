@@ -25,8 +25,9 @@ const NDVIOverlay: React.FC<NDVIOverlayProps> = () => {
     <TileLayer
       url={currentImage.tileUrl}
       opacity={opacity}
-      zIndex={1000} // Above base map, below UI controls
+      zIndex={2000} // High z-index to ensure visibility above all map layers
       attribution='&copy; <a href="https://agromonitoring.com/">Agromonitoring</a>'
+      className="ndvi-overlay-enhanced" // Add CSS class for enhanced visibility
       // Tile layer options for satellite imagery
       tms={false} // Standard XYZ tile scheme
       maxZoom={18}

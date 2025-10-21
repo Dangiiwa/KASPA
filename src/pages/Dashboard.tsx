@@ -83,8 +83,15 @@ const Dashboard: React.FC = () => {
   };
 
   const handlePolygonDrawn = (geoJson: GeoJSON, area: number) => {
+    console.log('🎯 Dashboard: handlePolygonDrawn called with area:', area);
     setDrawnPolygon(geoJson);
     setPolygonArea(area);
+    
+    // Add 200ms delay before exiting drawing mode to allow state to settle
+    setTimeout(() => {
+      console.log('⏰ Dashboard: Exiting drawing mode after state settlement');
+      setIsDrawingMode(false);
+    }, 200);
   };
 
   const handlePolygonCleared = () => {

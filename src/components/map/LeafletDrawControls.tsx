@@ -13,6 +13,29 @@ interface LeafletDrawControlsProps {
   onPolygonCleared: () => void;
 }
 
+// Fallback area calculation using shoelace formula for polygons
+const calculatePolygonArea = (latLngs: L.LatLng[]): number => {
+  if (latLngs.length < 3) return 0;
+  
+  // Convert to projected coordinates for more accurate area calculation
+  const points = latLngs.map(latLng => {
+    // Simple Mercator projection approximation
+    const x = latLng.lng * 111319.9; // degrees to meters at equator
+    const y = latLng.lat * 110540.0; // degrees to meters
+    return { x, y };
+  });
+  
+  // Shoelace formula
+  let area = 0;
+  for (let i = 0; i < points.length; i++) {
+    const j = (i + 1) % points.length;
+    area += points[i].x * points[j].y;
+    area -= points[j].x * points[i].y;
+  }
+  
+  return Math.abs(area) / 2; // Return absolute area in square meters
+};
+
 const LeafletDrawControls: React.FC<LeafletDrawControlsProps> = ({
   isDrawingMode,
   onDrawingModeChange,
@@ -23,10 +46,29 @@ const LeafletDrawControls: React.FC<LeafletDrawControlsProps> = ({
   const currentPolygonRef = useRef<L.Polygon | null>(null);
   const isInitializedRef = useRef(false);
   
+  // Debug: Log component render and props
+  console.log('🔧 LeafletDrawControls RENDER:', {
+    isDrawingMode,
+    hasMap: !!map,
+    hasCallbacks: {
+      onDrawingModeChange: !!onDrawingModeChange,
+      onPolygonDrawn: !!onPolygonDrawn,
+      onPolygonCleared: !!onPolygonCleared
+    }
+  });
+  
   // Use refs to store the latest callback functions (fixes stale closure)
   const onDrawingModeChangeRef = useRef(onDrawingModeChange);
   const onPolygonDrawnRef = useRef(onPolygonDrawn);
   const onPolygonClearedRef = useRef(onPolygonCleared);
+
+  // Debug: Log component mount/unmount
+  useEffect(() => {
+    console.log('🏗️ LeafletDrawControls MOUNTED');
+    return () => {
+      console.log('🧹 LeafletDrawControls UNMOUNTED');
+    };
+  }, []);
 
   // Update callback refs on every render (fixes stale closure)
   useEffect(() => {
@@ -35,34 +77,25 @@ const LeafletDrawControls: React.FC<LeafletDrawControlsProps> = ({
     onPolygonClearedRef.current = onPolygonCleared;
   });
 
-  // Initialize Geoman once
+  // Initialize Geoman configuration (without controls)
   useEffect(() => {
     if (!map || isInitializedRef.current) return;
 
-    console.log('🚀 Initializing Geoman controls...');
+    console.log('🚀 Initializing Geoman configuration...');
+    
+    // Add detailed Geoman state debugging
+    console.log('🔍 Geoman state check:', {
+      hasMapPm: !!map.pm,
+      pmMethods: map.pm ? Object.getOwnPropertyNames(map.pm) : 'no pm',
+      pmProto: map.pm ? Object.getOwnPropertyNames(Object.getPrototypeOf(map.pm)) : 'no proto'
+    });
 
-    // Wait a moment for map to be fully ready
-    const initTimeout = setTimeout(() => {
-      try {
-        // Initialize Geoman
-        map.pm.addControls({
-          position: 'bottomleft',
-          drawCircle: false,
-          drawMarker: false,
-          drawCircleMarker: false,
-          drawPolyline: false,
-          drawRectangle: false,
-          drawPolygon: true,
-          editMode: true,
-          dragMode: false,
-          cutPolygon: false,
-          removalMode: true,
-          rotateMode: false,
-        });
-
-        console.log('✅ Geoman controls added successfully');
-
-        // Configure polygon drawing options with better completion settings
+    try {
+      // Wait for map to be fully ready before Geoman setup
+      map.whenReady(() => {
+        console.log('🗺️ Map is fully ready, setting up Geoman...');
+        
+        // Configure polygon drawing options (no controls added yet)
         map.pm.setPathOptions({
           color: '#059669',
           weight: 3,
@@ -73,7 +106,6 @@ const LeafletDrawControls: React.FC<LeafletDrawControlsProps> = ({
 
         // Set global options for better polygon completion
         map.pm.setGlobalOptions({
-          finishOn: 'dblclick', // Double-click to finish
           allowSelfIntersection: false,
           templineStyle: {
             color: '#059669',
@@ -89,127 +121,201 @@ const LeafletDrawControls: React.FC<LeafletDrawControlsProps> = ({
 
         console.log('✅ Geoman configuration complete');
         isInitializedRef.current = true;
-
-      } catch (error) {
-        console.error('❌ Geoman initialization failed:', error);
-      }
-    }, 100); // Small delay to ensure map is ready
-
-    // Event handlers for drawing using refs (fixes stale closure)
-    const handleDrawCreated = (e: any) => {
-      console.log('pm:create event fired!', e);
-      const { layer } = e;
-      
-      // Clear any existing polygons
-      map.eachLayer((layer) => {
-        if (layer instanceof L.Polygon && layer !== currentPolygonRef.current) {
-          map.removeLayer(layer);
-        }
+        
+        // Setup event listeners AFTER Geoman is fully configured
+        setupGeomanEvents();
       });
-      
-      currentPolygonRef.current = layer;
-      
-      // Calculate area in hectares
-      const latLngs = layer.getLatLngs()[0] as L.LatLng[];
-      const area = L.GeometryUtil.geodesicArea(latLngs) / 10000;
-      
-      console.log('Polygon area calculated:', area);
-      
-      // Convert to GeoJSON with proper closure
-      const geoJson = layer.toGeoJSON() as GeoJSON;
-      
-      // Ensure the polygon is properly closed (first point = last point)
-      const coordinates = geoJson.geometry.coordinates[0];
-      if (coordinates.length > 0) {
-        const firstPoint = coordinates[0];
-        const lastPoint = coordinates[coordinates.length - 1];
-        
-        // If not properly closed, close it
-        if (firstPoint[0] !== lastPoint[0] || firstPoint[1] !== lastPoint[1]) {
-          coordinates.push([firstPoint[0], firstPoint[1]]);
-        }
-      }
-      
-      console.log('Calling onPolygonDrawn with:', { geoJson, area });
-      
-      // Use refs to call the latest callback functions
-      onDrawingModeChangeRef.current(false);
-      onPolygonDrawnRef.current(geoJson, area);
-    };
 
-    const handleDrawDeleted = (e: any) => {
-      const { layer } = e;
-      if (layer === currentPolygonRef.current) {
-        currentPolygonRef.current = null;
-        onPolygonClearedRef.current();
-      }
-    };
+    } catch (error) {
+      console.error('❌ Geoman initialization failed:', error);
+    }
 
-    const handleDrawEdited = (e: any) => {
-      const { layer } = e;
-      if (layer === currentPolygonRef.current) {
-        // Recalculate area
-        const latLngs = layer.getLatLngs()[0] as L.LatLng[];
-        const area = L.GeometryUtil.geodesicArea(latLngs) / 10000;
+    // Move event setup to separate function for better control
+    const setupGeomanEvents = () => {
+      console.log('🎧 Setting up Geoman event listeners...');
+      
+      // Try BOTH map.on() and map.pm.on() approaches
+      const setupMethod1 = () => {
+        console.log('📡 Method 1: Using map.on() for Geoman events');
         
-        // Convert to GeoJSON
-        const geoJson = layer.toGeoJSON() as GeoJSON;
+        // Attach event listeners with inline functions that access current ref values
+          map.on('pm:create', (e: any) => {
+            console.log('🎯 METHOD 1: pm:create event fired!', e);
+            handlePolygonCreate(e);
+          });
+        };
         
-        // Ensure proper closure
-        const coordinates = geoJson.geometry.coordinates[0];
-        if (coordinates.length > 0) {
-          const firstPoint = coordinates[0];
-          const lastPoint = coordinates[coordinates.length - 1];
+        const setupMethod2 = () => {
+          console.log('📡 Method 2: Using map.pm.on() for Geoman events');
           
-          if (firstPoint[0] !== lastPoint[0] || firstPoint[1] !== lastPoint[1]) {
-            coordinates.push([firstPoint[0], firstPoint[1]]);
+          // Alternative approach using map.pm.on()
+          if (map.pm && typeof map.pm.on === 'function') {
+            map.pm.on('pm:create', (e: any) => {
+              console.log('🎯 METHOD 2: pm:create event fired!', e);
+              handlePolygonCreate(e);
+            });
+          } else {
+            console.error('❌ map.pm.on is not available');
           }
-        }
+        };
         
-        onPolygonDrawnRef.current(geoJson, area);
-      }
-    };
+        // Common polygon handling function
+        const handlePolygonCreate = (e: any) => {
+          console.log('🔍 pm:create event details:', {
+            layerType: e.layerType,
+            shape: e.shape,
+            layer: e.layer,
+            hasLayer: !!e.layer,
+            layerLatLngs: e.layer?.getLatLngs ? e.layer.getLatLngs() : 'no getLatLngs'
+          });
+          const { layer } = e;
+          
+          // Set current polygon reference immediately
+          currentPolygonRef.current = layer;
 
-    const handleDrawStart = (e: any) => {
-      console.log('pm:drawstart event fired!', e);
-      onDrawingModeChangeRef.current(true);
-    };
-
-    const handleDrawStop = (e: any) => {
-      console.log('pm:drawend event fired!', e);
-      onDrawingModeChangeRef.current(false);
-    };
-
-    const handleGlobalCreate = (e: any) => {
-      console.log('pm:globaldrawmodetoggled event fired!', e);
-    };
-
-    // Attach event listeners for Geoman
-    map.on('pm:create', handleDrawCreated);
-    map.on('pm:remove', handleDrawDeleted);
-    map.on('pm:update', handleDrawEdited);
-    map.on('pm:drawstart', handleDrawStart);
-    map.on('pm:drawend', handleDrawStop);
-    map.on('pm:globaldrawmodetoggled', handleGlobalCreate);
-    
-    // Additional debugging events
-    map.on('pm:vertexadded', (e: any) => console.log('pm:vertexadded', e));
-    map.on('pm:centerplaced', (e: any) => console.log('pm:centerplaced', e));
+          // Clear any existing polygons except the one we just drew
+          map.eachLayer((mapLayer) => {
+            if (mapLayer instanceof L.Polygon && mapLayer !== currentPolygonRef.current) {
+              map.removeLayer(mapLayer);
+            }
+          });
+          
+          // Calculate area in hectares with fallback
+          const latLngs = layer.getLatLngs()[0] as L.LatLng[];
+          let area: number;
+          
+          try {
+            // Try using L.GeometryUtil if available
+            if (L.GeometryUtil && typeof L.GeometryUtil.geodesicArea === 'function') {
+              area = L.GeometryUtil.geodesicArea(latLngs) / 10000;
+              console.log('📐 Area calculated using L.GeometryUtil:', area);
+            } else {
+              throw new Error('L.GeometryUtil.geodesicArea not available');
+            }
+          } catch (error) {
+            console.warn('⚠️ L.GeometryUtil not available, using fallback area calculation');
+            // Fallback: Simple polygon area calculation using shoelace formula
+            area = calculatePolygonArea(latLngs) / 10000;
+            console.log('📐 Area calculated using fallback method:', area);
+          }
+          
+          console.log('📐 Polygon area calculated:', area);
+          
+          // Convert to GeoJSON with proper closure
+          const geoJson = layer.toGeoJSON() as GeoJSON;
+          
+          // Ensure the polygon is properly closed (first point = last point)
+          const coordinates = geoJson.geometry.coordinates[0];
+          if (coordinates.length > 0) {
+            const firstPoint = coordinates[0];
+            const lastPoint = coordinates[coordinates.length - 1];
+            
+            // If not properly closed, close it
+            if (firstPoint[0] !== lastPoint[0] || firstPoint[1] !== lastPoint[1]) {
+              coordinates.push([firstPoint[0], firstPoint[1]]);
+            }
+          }
+          
+          console.log('📞 Calling CURRENT onPolygonDrawn with:', { geoJson, area });
+          
+          // CRITICAL: Access current ref values (not stale closures)
+          if (onPolygonDrawnRef.current) {
+            onPolygonDrawnRef.current(geoJson, area);
+            console.log('✅ onPolygonDrawn called successfully');
+          } else {
+            console.error('❌ onPolygonDrawnRef.current is null/undefined!');
+          }
+          
+          // REMOVED: Don't immediately change drawing mode - let Dashboard handle timing
+          console.log('ℹ️ Drawing mode change will be handled by Dashboard after state settles');
+        };
+        
+        // Try both methods
+        setupMethod1();
+        setupMethod2();
+        
+        // Setup other events with both methods too
+        const setupOtherEvents = () => {
+          // Standard events
+          map.on('pm:drawstart', (e: any) => console.log('🎬 pm:drawstart - Drawing started', e));
+          map.on('pm:drawend', (e: any) => {
+            console.log('🏁 pm:drawend event fired!', e);
+            setTimeout(() => {
+              if (onDrawingModeChangeRef.current) {
+                onDrawingModeChangeRef.current(false);
+                console.log('🔄 Fallback: Drawing mode changed to false via pm:drawend');
+              }
+            }, 100);
+          });
+          map.on('pm:vertexadded', (e: any) => console.log('📍 pm:vertexadded - Point added to polygon', e));
+          
+          // Geoman-specific events if available
+          if (map.pm && typeof map.pm.on === 'function') {
+            map.pm.on('pm:drawstart', (e: any) => console.log('🎬 GEOMAN pm:drawstart', e));
+            map.pm.on('pm:drawend', (e: any) => console.log('🏁 GEOMAN pm:drawend', e));
+            map.pm.on('pm:vertexadded', (e: any) => console.log('📍 GEOMAN pm:vertexadded', e));
+          }
+        };
+        
+        setupOtherEvents();
+        
+        // ENHANCED FALLBACK: Periodic polygon detection
+        let polygonCheckInterval: number;
+        
+        const startPolygonMonitoring = () => {
+          console.log('🔄 Starting periodic polygon detection...');
+          polygonCheckInterval = window.setInterval(() => {
+            let foundPolygon = null;
+            map.eachLayer((layer) => {
+              if (layer instanceof L.Polygon && layer !== currentPolygonRef.current) {
+                console.log('🔍 PERIODIC: Found potential polygon layer:', layer);
+                foundPolygon = layer;
+              }
+            });
+            
+            if (foundPolygon && !currentPolygonRef.current) {
+              console.log('🎯 PERIODIC FALLBACK: Found polygon that events missed!');
+              clearInterval(polygonCheckInterval);
+              handlePolygonCreate({ layer: foundPolygon, layerType: 'polygon', shape: 'Polygon' });
+            }
+          }, 500); // Check every 500ms
+        };
+        
+        const stopPolygonMonitoring = () => {
+          if (polygonCheckInterval) {
+            clearInterval(polygonCheckInterval);
+          }
+        };
+        
+        // Start monitoring when drawing mode is enabled
+        if (map.pm.globalDrawModeEnabled && map.pm.globalDrawModeEnabled()) {
+          startPolygonMonitoring();
+        }
+      };
+      
+      // Try setting up events immediately and after delay
+      setupGeomanEvents();
+      setTimeout(setupGeomanEvents, 100);
 
     return () => {
-      // Cleanup Geoman events
-      map.off('pm:create', handleDrawCreated);
-      map.off('pm:remove', handleDrawDeleted);
-      map.off('pm:update', handleDrawEdited);
-      map.off('pm:drawstart', handleDrawStart);
-      map.off('pm:drawend', handleDrawStop);
-      map.off('pm:globaldrawmodetoggled', handleGlobalCreate);
+      // Cleanup Geoman events (remove all event listeners)
+      console.log('🧹 Cleaning up LeafletDrawControls event listeners');
+      map.off('pm:create');
+      map.off('pm:remove');
+      map.off('pm:update');
+      map.off('pm:drawstart');
+      map.off('pm:drawend');
+      map.off('pm:globaldrawmodetoggled');
       map.off('pm:vertexadded');
       map.off('pm:centerplaced');
+      map.off('pm:snapdrag');
+      map.off('pm:layerreset');
+      map.off('pm:markerdragend');
+      map.off('click');
     };
   }, [map]); // Remove callback dependencies - they're handled by refs now
 
-  // Handle drawing mode changes from parent
+  // Handle drawing mode changes - pure programmatic control (no toolbar controls)
   useEffect(() => {
     if (!map || !isInitializedRef.current) {
       console.log('Drawing mode change skipped - map:', !!map, 'initialized:', isInitializedRef.current);
@@ -219,15 +325,34 @@ const LeafletDrawControls: React.FC<LeafletDrawControlsProps> = ({
     console.log('Drawing mode changed:', isDrawingMode);
 
     if (isDrawingMode) {
-      console.log('✅ Enabling polygon drawing mode...');
-      // Enable polygon drawing mode
-      map.pm.enableDraw('Polygon');
+      console.log('✅ Enabling polygon drawing mode (pure programmatic)...');
+      
+      // Enable polygon drawing directly without toolbar controls
+      // Test different finishOn configurations to ensure pm:create fires
+      console.log('🔧 Attempting polygon drawing with minimal config...');
+      
+      try {
+        // Option 1: Try with no finishOn property (use Geoman defaults)
+        map.pm.enableDraw('Polygon', {
+          allowSelfIntersection: false,
+          continueDrawing: false,
+          snappable: true,
+          snapDistance: 15
+          // Removed finishOn entirely - let Geoman handle completion
+        });
+        console.log('✅ Polygon drawing enabled with default completion');
+      } catch (error) {
+        console.error('❌ Failed to enable polygon drawing:', error);
+      }
+      
       console.log('Polygon drawing enabled. Active draw mode:', map.pm.globalDrawModeEnabled());
     } else {
-      console.log('❌ Disabling all drawing modes...');
-      // Disable all drawing modes
+      console.log('❌ Disabling drawing mode...');
+      
+      // Disable drawing
       map.pm.disableDraw();
-      console.log('Drawing disabled. Active draw mode:', map.pm.globalDrawModeEnabled());
+      
+      console.log('Drawing disabled');
     }
   }, [isDrawingMode, map]);
 
