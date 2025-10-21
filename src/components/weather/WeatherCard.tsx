@@ -1,5 +1,5 @@
 import React from 'react';
-import { Box } from '@mui/material';
+import { Box, Typography } from '@mui/material';
 import { 
   Thermostat, 
   WaterDrop, 
@@ -208,239 +208,230 @@ const getUVLevel = (uvi: number): string => {
 // Individual card components with contextual styling
 export const TemperatureCard: React.FC<{ weatherData?: WeatherData; darkTheme?: boolean }> = ({ weatherData, darkTheme = true }) => {
   const temp = weatherData ? kelvinToCelsius(weatherData.main.temp) : null;
-  const [animatedValue, setAnimatedValue] = React.useState(0);
-  const [isVisible, setIsVisible] = React.useState(false);
   
-  React.useEffect(() => {
-    const timer = setTimeout(() => {
-      setIsVisible(true);
-      setAnimatedValue(temp || 0);
-    }, 200);
-    return () => clearTimeout(timer);
-  }, [temp]);
-  
-  const getTemperatureVariant = () => {
-    if (!temp) return 'dashlet--info';
-    if (temp > 30) return 'dashlet--primary';  // Very hot - red
-    if (temp > 20) return 'dashlet--warning';  // Warm - orange
-    if (temp > 10) return 'dashlet--success';  // Comfortable - green
-    return 'dashlet--info';  // Cold - blue
-  };
-  
-  const getTemperatureStatus = () => {
-    if (!temp) return 'Loading';
-    if (temp > 30) return 'Very Hot';
-    if (temp > 20) return 'Warm';
-    if (temp > 10) return 'Optimal';
-    return 'Cool';
-  };
-  
-  const getTempGradient = () => {
-    if (!temp) return 'linear-gradient(135deg, #42a5f5 0%, #1e88e5 100%)';
-    if (temp > 30) return 'linear-gradient(135deg, #ff6b6b 0%, #ee5a24 100%)';
-    if (temp > 20) return 'linear-gradient(135deg, #ffa726 0%, #fb8c00 100%)';
-    if (temp > 10) return 'linear-gradient(135deg, #66bb6a 0%, #43a047 100%)';
-    return 'linear-gradient(135deg, #42a5f5 0%, #1e88e5 100%)';
+  const getTemperatureColor = () => {
+    if (!temp) return '#64748b';
+    if (temp > 30) return '#ef4444';
+    if (temp > 20) return '#f59e0b';
+    if (temp > 10) return '#10b981';
+    return '#3b82f6';
   };
   
   return (
-    <div className={`dashlet ${getTemperatureVariant()} animate-fade-in-up`}>
-      <div className="dashlet-header">
-        <h3 className="dashlet-title">Temperature</h3>
-        <Box display="flex" alignItems="center" gap={0.5}>
-          <Thermostat className="dashlet-icon" sx={{ 
-            color: temp ? (temp > 30 ? '#ff6b6b' : temp > 20 ? '#ffa726' : temp > 10 ? '#66bb6a' : '#42a5f5') : '#42a5f5'
-          }} />
-          <span className={`status-indicator ${
-            temp && temp > 30 ? 'status-critical' : 
-            temp && temp > 20 ? 'status-low-match' : 
-            temp && temp > 10 ? 'status-best-match' : 
-            'status-good-match'
-          }`}>
-            {getTemperatureStatus()}
-          </span>
-        </Box>
-      </div>
-      
-      <Box flex={1} display="flex" flexDirection="column" justifyContent="center">
-        <div 
-          className="dashlet-value" 
-          style={{ 
-            background: getTempGradient(),
-            WebkitBackgroundClip: 'text',
-            WebkitTextFillColor: 'transparent',
-            backgroundClip: 'text',
-            fontSize: '22px',
-            margin: '4px 0',
-            transition: 'all 0.6s cubic-bezier(0.4, 0, 0.2, 1)',
-            transform: isVisible ? 'scale(1)' : 'scale(0.9)',
-            opacity: isVisible ? 1 : 0
+    <Box
+      sx={{
+        width: 160,
+        height: 100,
+        backgroundColor: '#ffffff',
+        borderRadius: '8px',
+        border: 'none',
+        boxShadow: '0 1px 3px rgba(0, 0, 0, 0.05)',
+        display: 'flex',
+        flexDirection: 'column',
+        alignItems: 'center',
+        justifyContent: 'center',
+        padding: 1.5,
+        transition: 'all 0.2s ease',
+        '&:hover': {
+          backgroundColor: '#fafafa',
+          transform: 'translateY(-1px)',
+          boxShadow: '0 2px 4px rgba(0, 0, 0, 0.08)'
+        }
+      }}
+    >
+      {/* Header */}
+      <Box display="flex" alignItems="center" justifyContent="space-between" width="100%" mb={1}>
+        <Typography
+          variant="caption"
+          sx={{
+            fontSize: '12px',
+            color: '#6b7280',
+            fontWeight: 500,
           }}
         >
-          {weatherData ? `${temp?.toFixed(0)}°C` : '--'}
-        </div>
-        
-        {weatherData && (
-          <p className="dashlet-subtitle" style={{ fontSize: '11px', margin: 0 }}>
-            Feels like {kelvinToCelsius(weatherData.main.feels_like).toFixed(0)}°C
-          </p>
-        )}
+          Temperature
+        </Typography>
+        <Thermostat sx={{ 
+          fontSize: 16, 
+          color: getTemperatureColor()
+        }} />
       </Box>
-    </div>
+
+      {/* Value */}
+      <Typography
+        variant="h4"
+        sx={{
+          fontWeight: 700,
+          fontSize: '24px',
+          color: getTemperatureColor(),
+          lineHeight: 1,
+          mb: 0.5
+        }}
+      >
+        {weatherData ? `${temp?.toFixed(0)}°C` : '--'}
+      </Typography>
+      
+      {/* Subtitle */}
+      {weatherData && (
+        <Typography
+          variant="caption"
+          sx={{
+            fontSize: '10px',
+            color: '#94a3b8',
+            textAlign: 'center'
+          }}
+        >
+          Feels like {kelvinToCelsius(weatherData.main.feels_like).toFixed(0)}°C
+        </Typography>
+      )}
+    </Box>
   );
 };
 
 export const HumidityCard: React.FC<{ weatherData?: WeatherData; darkTheme?: boolean }> = ({ weatherData, darkTheme = true }) => {
   const humidity = weatherData?.main.humidity;
-  const [animatedValue, setAnimatedValue] = React.useState(0);
-  const [isVisible, setIsVisible] = React.useState(false);
   
-  React.useEffect(() => {
-    const timer = setTimeout(() => {
-      setIsVisible(true);
-      setAnimatedValue(humidity || 0);
-    }, 250);
-    return () => clearTimeout(timer);
-  }, [humidity]);
-  
-  const getHumidityVariant = () => {
-    if (!humidity) return 'dashlet--info';
-    if (humidity > 70) return 'dashlet--info';     // High humidity - blue
-    if (humidity >= 40) return 'dashlet--success'; // Optimal - green
-    return 'dashlet--warning';                     // Low humidity - orange
-  };
-  
-  const getHumidityStatus = () => {
-    if (!humidity) return 'Loading';
-    if (humidity > 70) return 'High';
-    if (humidity >= 40) return 'Optimal';
-    return 'Low';
-  };
-  
-  const getHumidityGradient = () => {
-    if (!humidity) return 'linear-gradient(135deg, #42a5f5 0%, #1e88e5 100%)';
-    if (humidity > 70) return 'linear-gradient(135deg, #29b6f6 0%, #0277bd 100%)';
-    if (humidity >= 40) return 'linear-gradient(135deg, #66bb6a 0%, #43a047 100%)';
-    return 'linear-gradient(135deg, #ffa726 0%, #fb8c00 100%)';
+  const getHumidityColor = () => {
+    if (!humidity) return '#64748b';
+    if (humidity > 70) return '#3b82f6';
+    if (humidity >= 40) return '#10b981';
+    return '#f59e0b';
   };
   
   return (
-    <div className={`dashlet ${getHumidityVariant()} animate-fade-in-up`}>
-      <div className="dashlet-header">
-        <h3 className="dashlet-title">Humidity</h3>
-        <Box display="flex" alignItems="center" gap={0.5}>
-          <WaterDrop className="dashlet-icon" sx={{ 
-            color: humidity ? (humidity > 70 ? '#29b6f6' : humidity >= 40 ? '#66bb6a' : '#ffa726') : '#42a5f5'
-          }} />
-          <span className={`status-indicator ${
-            humidity && humidity > 70 ? 'status-good-match' : 
-            humidity && humidity >= 40 ? 'status-best-match' : 
-            'status-low-match'
-          }`}>
-            {getHumidityStatus()}
-          </span>
-        </Box>
-      </div>
-      
-      <Box flex={1} display="flex" flexDirection="column" justifyContent="center">
-        <div 
-          className="dashlet-value" 
-          style={{ 
-            background: getHumidityGradient(),
-            WebkitBackgroundClip: 'text',
-            WebkitTextFillColor: 'transparent',
-            backgroundClip: 'text',
-            fontSize: '22px',
-            margin: '4px 0',
-            transition: 'all 0.6s cubic-bezier(0.4, 0, 0.2, 1)',
-            transform: isVisible ? 'scale(1)' : 'scale(0.9)',
-            opacity: isVisible ? 1 : 0
+    <Box
+      sx={{
+        width: 160,
+        height: 100,
+        backgroundColor: '#ffffff',
+        borderRadius: '8px',
+        border: 'none',
+        boxShadow: '0 1px 3px rgba(0, 0, 0, 0.05)',
+        display: 'flex',
+        flexDirection: 'column',
+        alignItems: 'center',
+        justifyContent: 'center',
+        padding: 1.5,
+        transition: 'all 0.2s ease',
+        '&:hover': {
+          backgroundColor: '#fafafa',
+          transform: 'translateY(-1px)',
+          boxShadow: '0 2px 4px rgba(0, 0, 0, 0.08)'
+        }
+      }}
+    >
+      {/* Header */}
+      <Box display="flex" alignItems="center" justifyContent="space-between" width="100%" mb={1}>
+        <Typography
+          variant="caption"
+          sx={{
+            fontSize: '12px',
+            color: '#6b7280',
+            fontWeight: 500,
           }}
         >
-          {humidity ? `${humidity}%` : '--'}
-        </div>
+          Humidity
+        </Typography>
+        <WaterDrop sx={{ 
+          fontSize: 16, 
+          color: getHumidityColor()
+        }} />
       </Box>
-    </div>
+
+      {/* Value */}
+      <Typography
+        variant="h4"
+        sx={{
+          fontWeight: 700,
+          fontSize: '24px',
+          color: getHumidityColor(),
+          lineHeight: 1,
+        }}
+      >
+        {humidity ? `${humidity}%` : '--'}
+      </Typography>
+    </Box>
   );
 };
 
 export const WindCard: React.FC<{ weatherData?: WeatherData; darkTheme?: boolean }> = ({ weatherData, darkTheme = true }) => {
   const windSpeed = weatherData?.wind.speed;
-  const [animatedValue, setAnimatedValue] = React.useState(0);
-  const [isVisible, setIsVisible] = React.useState(false);
   
-  React.useEffect(() => {
-    const timer = setTimeout(() => {
-      setIsVisible(true);
-      setAnimatedValue(windSpeed || 0);
-    }, 300);
-    return () => clearTimeout(timer);
-  }, [windSpeed]);
-  
-  const getWindVariant = () => {
-    if (!windSpeed) return 'dashlet--success';
-    if (windSpeed > 10) return 'dashlet--primary';   // Strong wind - red
-    if (windSpeed > 5) return 'dashlet--warning';    // Moderate wind - orange
-    return 'dashlet--success';                       // Light wind - green
-  };
-  
-  const getWindStatus = () => {
-    if (!windSpeed) return 'Calm';
-    if (windSpeed > 10) return 'Strong';
-    if (windSpeed > 5) return 'Moderate';
-    return 'Light';
-  };
-  
-  const getWindGradient = () => {
-    if (!windSpeed) return 'linear-gradient(135deg, #66bb6a 0%, #43a047 100%)';
-    if (windSpeed > 10) return 'linear-gradient(135deg, #ff6b6b 0%, #ee5a24 100%)';
-    if (windSpeed > 5) return 'linear-gradient(135deg, #ffa726 0%, #fb8c00 100%)';
-    return 'linear-gradient(135deg, #66bb6a 0%, #43a047 100%)';
+  const getWindColor = () => {
+    if (!windSpeed) return '#64748b';
+    if (windSpeed > 10) return '#ef4444';
+    if (windSpeed > 5) return '#f59e0b';
+    return '#10b981';
   };
   
   return (
-    <div className={`dashlet ${getWindVariant()} animate-fade-in-up`}>
-      <div className="dashlet-header">
-        <h3 className="dashlet-title">Wind</h3>
-        <Box display="flex" alignItems="center" gap={0.5}>
-          <Air className="dashlet-icon" sx={{ 
-            color: windSpeed ? (windSpeed > 10 ? '#ff6b6b' : windSpeed > 5 ? '#ffa726' : '#66bb6a') : '#66bb6a'
-          }} />
-          <span className={`status-indicator ${
-            windSpeed && windSpeed > 10 ? 'status-critical' : 
-            windSpeed && windSpeed > 5 ? 'status-low-match' : 
-            'status-best-match'
-          }`}>
-            {getWindStatus()}
-          </span>
-        </Box>
-      </div>
-      
-      <Box flex={1} display="flex" flexDirection="column" justifyContent="center">
-        <div 
-          className="dashlet-value" 
-          style={{ 
-            background: getWindGradient(),
-            WebkitBackgroundClip: 'text',
-            WebkitTextFillColor: 'transparent',
-            backgroundClip: 'text',
-            fontSize: '22px',
-            margin: '4px 0',
-            transition: 'all 0.6s cubic-bezier(0.4, 0, 0.2, 1)',
-            transform: isVisible ? 'scale(1)' : 'scale(0.9)',
-            opacity: isVisible ? 1 : 0
+    <Box
+      sx={{
+        width: 160,
+        height: 100,
+        backgroundColor: '#ffffff',
+        borderRadius: '8px',
+        border: 'none',
+        boxShadow: '0 1px 3px rgba(0, 0, 0, 0.05)',
+        display: 'flex',
+        flexDirection: 'column',
+        alignItems: 'center',
+        justifyContent: 'center',
+        padding: 1.5,
+        transition: 'all 0.2s ease',
+        '&:hover': {
+          backgroundColor: '#fafafa',
+          transform: 'translateY(-1px)',
+          boxShadow: '0 2px 4px rgba(0, 0, 0, 0.08)'
+        }
+      }}
+    >
+      {/* Header */}
+      <Box display="flex" alignItems="center" justifyContent="space-between" width="100%" mb={1}>
+        <Typography
+          variant="caption"
+          sx={{
+            fontSize: '12px',
+            color: '#6b7280',
+            fontWeight: 500,
           }}
         >
-          {windSpeed ? `${windSpeed} m/s` : '--'}
-        </div>
-        
-        {weatherData && (
-          <p className="dashlet-subtitle" style={{ fontSize: '11px', margin: 0 }}>
-            {getWindDirection(weatherData.wind.deg)} ({weatherData.wind.deg}°)
-          </p>
-        )}
+          Wind
+        </Typography>
+        <Air sx={{ 
+          fontSize: 16, 
+          color: getWindColor()
+        }} />
       </Box>
-    </div>
+
+      {/* Value */}
+      <Typography
+        variant="h4"
+        sx={{
+          fontWeight: 700,
+          fontSize: '20px',
+          color: getWindColor(),
+          lineHeight: 1,
+          mb: 0.5
+        }}
+      >
+        {windSpeed ? `${windSpeed} m/s` : '--'}
+      </Typography>
+      
+      {/* Subtitle */}
+      {weatherData && (
+        <Typography
+          variant="caption"
+          sx={{
+            fontSize: '10px',
+            color: '#94a3b8',
+            textAlign: 'center'
+          }}
+        >
+          {getWindDirection(weatherData.wind.deg)} ({weatherData.wind.deg}°)
+        </Typography>
+      )}
+    </Box>
   );
 };
 
@@ -457,75 +448,67 @@ export const VisibilityCard: React.FC<{ weatherData?: WeatherData; darkTheme?: b
 
 export const PressureCard: React.FC<{ weatherData?: WeatherData; darkTheme?: boolean }> = ({ weatherData, darkTheme = true }) => {
   const pressure = weatherData?.main.pressure;
-  const [animatedValue, setAnimatedValue] = React.useState(0);
-  const [isVisible, setIsVisible] = React.useState(false);
   
-  React.useEffect(() => {
-    const timer = setTimeout(() => {
-      setIsVisible(true);
-      setAnimatedValue(pressure || 0);
-    }, 350);
-    return () => clearTimeout(timer);
-  }, [pressure]);
-  
-  const getPressureVariant = () => {
-    if (!pressure) return 'dashlet--info';
-    if (pressure > 1020) return 'dashlet--success';   // High pressure - green
-    if (pressure >= 1000) return 'dashlet--info';     // Normal pressure - blue
-    return 'dashlet--warning';                        // Low pressure - orange
-  };
-  
-  const getPressureStatus = () => {
-    if (!pressure) return 'Loading';
-    if (pressure > 1020) return 'High';
-    if (pressure >= 1000) return 'Normal';
-    return 'Low';
-  };
-  
-  const getPressureGradient = () => {
-    if (!pressure) return 'linear-gradient(135deg, #42a5f5 0%, #1e88e5 100%)';
-    if (pressure > 1020) return 'linear-gradient(135deg, #66bb6a 0%, #43a047 100%)';
-    if (pressure >= 1000) return 'linear-gradient(135deg, #42a5f5 0%, #1e88e5 100%)';
-    return 'linear-gradient(135deg, #ffa726 0%, #fb8c00 100%)';
+  const getPressureColor = () => {
+    if (!pressure) return '#64748b';
+    if (pressure > 1020) return '#10b981';
+    if (pressure >= 1000) return '#3b82f6';
+    return '#f59e0b';
   };
   
   return (
-    <div className={`dashlet ${getPressureVariant()} animate-fade-in-up`}>
-      <div className="dashlet-header">
-        <h3 className="dashlet-title">Pressure</h3>
-        <Box display="flex" alignItems="center" gap={0.5}>
-          <Speed className="dashlet-icon" sx={{ 
-            color: pressure ? (pressure > 1020 ? '#66bb6a' : pressure >= 1000 ? '#42a5f5' : '#ffa726') : '#42a5f5'
-          }} />
-          <span className={`status-indicator ${
-            pressure && pressure > 1020 ? 'status-best-match' : 
-            pressure && pressure >= 1000 ? 'status-good-match' : 
-            'status-low-match'
-          }`}>
-            {getPressureStatus()}
-          </span>
-        </Box>
-      </div>
-      
-      <Box flex={1} display="flex" flexDirection="column" justifyContent="center">
-        <div 
-          className="dashlet-value" 
-          style={{ 
-            background: getPressureGradient(),
-            WebkitBackgroundClip: 'text',
-            WebkitTextFillColor: 'transparent',
-            backgroundClip: 'text',
-            fontSize: '22px',
-            margin: '4px 0',
-            transition: 'all 0.6s cubic-bezier(0.4, 0, 0.2, 1)',
-            transform: isVisible ? 'scale(1)' : 'scale(0.9)',
-            opacity: isVisible ? 1 : 0
+    <Box
+      sx={{
+        width: 160,
+        height: 100,
+        backgroundColor: '#ffffff',
+        borderRadius: '8px',
+        border: 'none',
+        boxShadow: '0 1px 3px rgba(0, 0, 0, 0.05)',
+        display: 'flex',
+        flexDirection: 'column',
+        alignItems: 'center',
+        justifyContent: 'center',
+        padding: 1.5,
+        transition: 'all 0.2s ease',
+        '&:hover': {
+          backgroundColor: '#fafafa',
+          transform: 'translateY(-1px)',
+          boxShadow: '0 2px 4px rgba(0, 0, 0, 0.08)'
+        }
+      }}
+    >
+      {/* Header */}
+      <Box display="flex" alignItems="center" justifyContent="space-between" width="100%" mb={1}>
+        <Typography
+          variant="caption"
+          sx={{
+            fontSize: '12px',
+            color: '#6b7280',
+            fontWeight: 500,
           }}
         >
-          {pressure ? `${pressure} hPa` : '--'}
-        </div>
+          Pressure
+        </Typography>
+        <Speed sx={{ 
+          fontSize: 16, 
+          color: getPressureColor()
+        }} />
       </Box>
-    </div>
+
+      {/* Value */}
+      <Typography
+        variant="h4"
+        sx={{
+          fontWeight: 700,
+          fontSize: '20px',
+          color: getPressureColor(),
+          lineHeight: 1,
+        }}
+      >
+        {pressure ? `${pressure} hPa` : '--'}
+      </Typography>
+    </Box>
   );
 };
 

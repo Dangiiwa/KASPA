@@ -1,4 +1,4 @@
-# Kaspa Farm Management System
+# KASPA Farm Management System
 
 A simplified agricultural mapping and weather monitoring application built with React, TypeScript, and Material-UI. This demo app leverages the core geoservice features from AetherView to provide farmers with essential farm management tools.
 

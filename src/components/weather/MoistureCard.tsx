@@ -1,6 +1,5 @@
 import React from 'react';
-import { Box, Typography, LinearProgress } from '@mui/material';
-import { TrendingDown, WaterDrop } from '@mui/icons-material';
+import { Box, Typography } from '@mui/material';
 import type { CurrentSoil } from '../../types';
 
 interface MoistureCardProps {
@@ -9,122 +8,130 @@ interface MoistureCardProps {
 
 const MoistureCard: React.FC<MoistureCardProps> = ({ currentSoil }) => {
   const [animatedPercentage, setAnimatedPercentage] = React.useState(0);
-  const [isVisible, setIsVisible] = React.useState(false);
   const moisturePercentage = currentSoil ? (currentSoil.moisture * 100) : 8;
 
   React.useEffect(() => {
-    // Animate the percentage when component mounts
     const timer = setTimeout(() => {
-      setIsVisible(true);
       setAnimatedPercentage(moisturePercentage);
-    }, 400);
-
+    }, 200);
     return () => clearTimeout(timer);
   }, [moisturePercentage]);
   
   const getMoistureColor = () => {
-    if (moisturePercentage >= 30) return '#4caf50';
-    if (moisturePercentage >= 15) return '#ff9800';
-    return '#f44336';
+    if (moisturePercentage >= 30) return '#10b981';
+    if (moisturePercentage >= 15) return '#f59e0b';
+    return '#ef4444';
   };
 
-  const getMoistureGradient = () => {
-    if (moisturePercentage >= 30) {
-      return 'linear-gradient(135deg, #4caf50 0%, #66bb6a 100%)';
-    } else if (moisturePercentage >= 15) {
-      return 'linear-gradient(135deg, #ff9800 0%, #ffb74d 100%)';
-    } else {
-      return 'linear-gradient(135deg, #f44336 0%, #e57373 100%)';
-    }
+  const getTrendChange = () => {
+    return '-7%'; // Mock trend data
   };
 
-  const getMoistureLevel = () => {
-    if (moisturePercentage >= 30) return 'Optimal';
-    if (moisturePercentage >= 15) return 'Low';
-    return 'Critical';
-  };
 
-  // Generate mock chart data points for the arc visualization
-  const generateChartData = () => {
-    const points = [];
-    const days = ['10', '11', '12', '13', '14', '15', '16'];
-    for (let i = 0; i < days.length; i++) {
-      const value = moisturePercentage + Math.random() * 10 - 5;
-      points.push({ day: days[i], value: Math.max(0, Math.min(100, value)) });
-    }
-    return points;
-  };
 
-  const chartData = generateChartData();
-
+  const radius = 32;
+  const circumference = 2 * Math.PI * radius;
+  const strokeDasharray = circumference;
+  const strokeDashoffset = circumference - (animatedPercentage / 100) * circumference;
+  
   return (
-    <div className={`dashlet ${
-      getMoistureLevel() === 'Critical' ? 'dashlet--primary' : 
-      getMoistureLevel() === 'Low' ? 'dashlet--warning' : 
-      'dashlet--info'
-    } animate-fade-in-up`}>
-        {/* Header */}
-        <div className="dashlet-header">
-          <h3 className="dashlet-title">Moisture</h3>
-          <Box display="flex" alignItems="center" gap={0.5}>
-            <WaterDrop className="dashlet-icon" sx={{ color: getMoistureColor() }} />
-            <span className={`status-indicator ${
-              getMoistureLevel() === 'Critical' ? 'status-critical' : 
-              getMoistureLevel() === 'Low' ? 'status-low-match' : 
-              'status-best-match'
-            }`}>
-              {getMoistureLevel()}
-            </span>
-          </Box>
-        </div>
+    <Box
+      sx={{
+        width: 160,
+        height: 160,
+        backgroundColor: '#ffffff',
+        borderRadius: '8px',
+        border: 'none',
+        boxShadow: '0 2px 4px rgba(0, 0, 0, 0.06)',
+        display: 'flex',
+        flexDirection: 'column',
+        alignItems: 'center',
+        justifyContent: 'center',
+        padding: 2,
+        transition: 'all 0.2s ease',
+        '&:hover': {
+          backgroundColor: '#fafafa',
+          transform: 'translateY(-2px)',
+          boxShadow: '0 4px 8px rgba(0, 0, 0, 0.08)'
+        }
+      }}
+    >
+      {/* Header */}
+      <Typography
+        variant="caption"
+        sx={{
+          fontSize: '12px',
+          color: '#6b7280',
+          fontWeight: 500,
+          textAlign: 'center',
+          mb: 1
+        }}
+      >
+        Moisture
+      </Typography>
 
-        {/* Compact Content */}
-        <Box display="flex" flexDirection="column" flex={1} justifyContent="space-between">
-          {/* Value and Simple Trend */}
-          <Box display="flex" alignItems="center" justifyContent="space-between" mb={1}>
-            <div className="dashlet-value">
-              {Math.round(animatedPercentage)}%
-            </div>
-            <Box display="flex" alignItems="center" gap={0.5}>
-              <TrendingDown sx={{ 
-                color: '#dc2626', 
-                fontSize: 16
-              }} />
-              <Typography variant="caption" sx={{ 
-                color: '#dc2626',
-                fontWeight: 500,
-                fontSize: '12px'
-              }}>
-                -7%
-              </Typography>
-            </Box>
-          </Box>
-
-          {/* Clean Progress Bar */}
-          <Box mb={1}>
-            <LinearProgress 
-              variant="determinate" 
-              value={animatedPercentage}
-              sx={{
-                height: 8,
-                borderRadius: 4,
-                backgroundColor: '#f1f5f9',
-                '& .MuiLinearProgress-bar': {
-                  background: getMoistureGradient(),
-                  borderRadius: 4
-                }
-              }}
-            />
-          </Box>
-
-          {/* Temperature Info */}
-          {currentSoil && (
-            <p className="dashlet-subtitle">
-              Soil: {currentSoil.t0.toFixed(1)}°C
-            </p>
-          )}
+      {/* Circular Progress */}
+      <Box position="relative" display="flex" alignItems="center" justifyContent="center" mb={1}>
+        <svg width="70" height="70" viewBox="0 0 70 70">
+          {/* Background Circle */}
+          <circle
+            cx="35"
+            cy="35"
+            r={radius}
+            fill="none"
+            stroke="#f3f4f6"
+            strokeWidth="3"
+          />
+          {/* Progress Circle */}
+          <circle
+            cx="35"
+            cy="35"
+            r={radius}
+            fill="none"
+            stroke={getMoistureColor()}
+            strokeWidth="3"
+            strokeLinecap="round"
+            strokeDasharray={strokeDasharray}
+            strokeDashoffset={strokeDashoffset}
+            transform="rotate(-90 35 35)"
+            style={{
+              transition: 'stroke-dashoffset 0.6s ease-in-out',
+            }}
+          />
+        </svg>
+        {/* Center Value */}
+        <Box
+          position="absolute"
+          display="flex"
+          alignItems="center"
+          justifyContent="center"
+        >
+          <Typography
+            variant="h4"
+            sx={{
+              fontWeight: 700,
+              fontSize: '28px',
+              color: '#1a1a1a',
+              lineHeight: 1,
+            }}
+          >
+            {Math.round(animatedPercentage)}%
+          </Typography>
         </Box>
-    </div>
+      </Box>
+
+      {/* Trend */}
+      <Typography
+        variant="caption"
+        sx={{
+          fontSize: '12px',
+          color: getMoistureColor(),
+          fontWeight: 500,
+        }}
+      >
+        {getTrendChange()}
+      </Typography>
+    </Box>
   );
 };
 

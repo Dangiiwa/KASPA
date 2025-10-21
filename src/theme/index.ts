@@ -1,31 +1,31 @@
 import { createTheme, type Theme } from '@mui/material/styles';
 
-// AetherView Color Palette
+// Professional Government Palette
 export const aetherColors = {
   // Primary colors
-  primary: '#004408',          // Deep forest green
-  secondary: '#E8DDB5',        // Warm cream
-  accent: '#3abe66',           // Bright green
-  gold: '#b99d34',            // Gold accent
+  primary: '#1e293b',          // Deep slate blue (professional)
+  secondary: '#f8fafc',        // Off-white background
+  accent: '#059669',           // Muted forest green for agriculture
+  gold: '#d97706',            // Muted amber accent
   
   // Status colors
-  success: '#4caf50',         // Green success
-  warning: '#ff9800',         // Orange warning  
-  error: '#f44336',           // Red error
-  info: '#2196f3',            // Blue info
+  success: '#059669',         // Muted green success
+  warning: '#d97706',         // Muted amber warning  
+  error: '#dc2626',           // Professional red error
+  info: '#0f766e',            // Teal info
   
-  // Neutral colors
+  // Professional neutral colors
   grey: {
-    50: '#fafafa',
-    100: '#f5f5f5',
-    200: '#eeeeee',
-    300: '#e0e0e0',
-    400: '#bdbdbd',
-    500: '#9e9e9e',
-    600: '#757575',
-    700: '#616161',
-    800: '#424242',
-    900: '#212121',
+    50: '#f8fafc',
+    100: '#f1f5f9',
+    200: '#e2e8f0',
+    300: '#cbd5e1',
+    400: '#94a3b8',
+    500: '#64748b',
+    600: '#475569',
+    700: '#334155',
+    800: '#1e293b',
+    900: '#0f172a',
   },
   
   // Dark theme colors
@@ -58,12 +58,15 @@ export const aetherColors = {
   }
 };
 
-// Typography scale
+// Professional Typography
 export const typography = {
   fontFamily: [
-    '"Helvetica Now Display"',
+    '"Inter"',
+    '-apple-system',
+    '"BlinkMacSystemFont"',
+    '"Segoe UI"',
     '"Roboto"',
-    '"Helvetica"',
+    '"Helvetica Neue"',
     '"Arial"',
     'sans-serif'
   ].join(','),
@@ -95,55 +98,53 @@ export const borderRadius = {
   round: '50%',
 };
 
-// Create the main theme
-export const createAetherTheme = (mode: 'light' | 'dark' = 'dark'): Theme => {
-  const isDark = mode === 'dark';
-  
+// Create the main theme (Light mode only)
+export const createAetherTheme = (): Theme => {
   return createTheme({
     palette: {
-      mode,
+      mode: 'light',
       primary: {
         main: aetherColors.primary,
-        light: '#2e7d32',
-        dark: '#001a02',
+        light: '#334155',
+        dark: '#0f172a',
         contrastText: '#ffffff',
       },
       secondary: {
         main: aetherColors.secondary,
-        light: '#f5f0d6',
-        dark: '#d4c79a',
-        contrastText: aetherColors.primary,
+        light: '#ffffff',
+        dark: '#f1f5f9',
+        contrastText: '#1e293b',
       },
       success: {
         main: aetherColors.success,
-        light: '#81c784',
-        dark: '#388e3c',
+        light: '#10b981',
+        dark: '#047857',
       },
       warning: {
         main: aetherColors.warning,
-        light: '#ffb74d',
-        dark: '#f57c00',
+        light: '#f59e0b',
+        dark: '#b45309',
       },
       error: {
         main: aetherColors.error,
-        light: '#e57373',
-        dark: '#d32f2f',
+        light: '#ef4444',
+        dark: '#b91c1c',
       },
       info: {
         main: aetherColors.info,
-        light: '#64b5f6',
-        dark: '#1976d2',
+        light: '#14b8a6',
+        dark: '#0d9488',
       },
       background: {
-        default: isDark ? aetherColors.dark.background : '#ffffff',
-        paper: isDark ? aetherColors.dark.surface : '#ffffff',
+        default: '#f8fafc',
+        paper: '#ffffff',
       },
       text: {
-        primary: isDark ? aetherColors.dark.text.primary : 'rgba(0, 0, 0, 0.87)',
-        secondary: isDark ? aetherColors.dark.text.secondary : 'rgba(0, 0, 0, 0.6)',
-        disabled: isDark ? aetherColors.dark.text.disabled : 'rgba(0, 0, 0, 0.38)',
+        primary: '#0f172a',
+        secondary: '#475569',
+        disabled: '#94a3b8',
       },
-      divider: isDark ? aetherColors.dark.border : 'rgba(0, 0, 0, 0.12)',
+      divider: '#e2e8f0',
       grey: aetherColors.grey,
     },
     typography: {
@@ -203,7 +204,7 @@ export const createAetherTheme = (mode: 'light' | 'dark' = 'dark'): Theme => {
       MuiCssBaseline: {
         styleOverrides: {
           ':root': {
-            // CSS Custom Properties for theme switching
+            // Professional Government Theme Variables
             '--color-primary': aetherColors.primary,
             '--color-secondary': aetherColors.secondary,
             '--color-accent': aetherColors.accent,
@@ -211,27 +212,30 @@ export const createAetherTheme = (mode: 'light' | 'dark' = 'dark'): Theme => {
             '--color-success': aetherColors.success,
             '--color-warning': aetherColors.warning,
             '--color-error': aetherColors.error,
-            '--color-background': isDark ? aetherColors.dark.background : '#ffffff',
-            '--color-surface': isDark ? aetherColors.dark.surface : '#ffffff',
-            '--color-border': isDark ? aetherColors.dark.border : 'rgba(0, 0, 0, 0.12)',
-            '--glass-light': aetherColors.glass.light,
-            '--glass-dark': aetherColors.glass.dark,
-            '--glass-dark-heavy': aetherColors.glass.darkHeavy,
+            '--color-background': '#f8fafc',
+            '--color-surface': '#ffffff',
+            '--color-border': '#e2e8f0',
+            '--color-text-primary': '#0f172a',
+            '--color-text-secondary': '#475569',
+            '--glass-light': 'rgba(255, 255, 255, 0.8)',
+            '--glass-dark': 'rgba(255, 255, 255, 0.05)',
+            '--glass-dark-heavy': 'rgba(30, 30, 30, 0.5)',
           },
           body: {
-            backgroundColor: isDark ? aetherColors.dark.background : '#ffffff',
-            color: isDark ? aetherColors.dark.text.primary : 'rgba(0, 0, 0, 0.87)',
+            backgroundColor: '#f8fafc',
+            color: '#0f172a',
             transition: 'background-color 0.3s ease, color 0.3s ease',
+            fontFamily: typography.fontFamily,
           },
           '*': {
             boxSizing: 'border-box',
           },
           // Glass morphism utility class
           '.glass-morphism': {
-            background: isDark ? aetherColors.glass.darkHeavy : aetherColors.glass.light,
-            backdropFilter: 'blur(24px)',
-            WebkitBackdropFilter: 'blur(24px)',
-            border: `1px solid ${isDark ? 'rgba(255, 255, 255, 0.1)' : 'rgba(255, 255, 255, 0.3)'}`,
+            background: 'rgba(255, 255, 255, 0.8)',
+            backdropFilter: 'blur(12px)',
+            WebkitBackdropFilter: 'blur(12px)',
+            border: '1px solid rgba(0, 0, 0, 0.08)',
           },
           // Status utility classes
           '.status-best-match': { color: aetherColors.status.bestMatch },
@@ -244,15 +248,14 @@ export const createAetherTheme = (mode: 'light' | 'dark' = 'dark'): Theme => {
       MuiCard: {
         styleOverrides: {
           root: {
-            backgroundColor: isDark ? aetherColors.dark.surface : '#ffffff',
-            border: isDark ? `1px solid ${aetherColors.dark.border}` : 'none',
-            borderRadius: borderRadius.lg,
-            transition: 'all 0.3s ease',
+            backgroundColor: '#ffffff',
+            border: '1px solid #e2e8f0',
+            borderRadius: borderRadius.sm,
+            transition: 'all 200ms ease-in-out',
+            boxShadow: '0 1px 3px rgba(0, 0, 0, 0.05)',
             '&:hover': {
-              transform: 'translateY(-2px)',
-              boxShadow: isDark 
-                ? '0 8px 32px rgba(0, 0, 0, 0.3)' 
-                : '0 8px 32px rgba(0, 0, 0, 0.12)',
+              transform: 'translateY(-1px)',
+              boxShadow: '0 4px 12px rgba(0, 0, 0, 0.08)',
             },
           },
         },
@@ -278,8 +281,9 @@ export const createAetherTheme = (mode: 'light' | 'dark' = 'dark'): Theme => {
       MuiPaper: {
         styleOverrides: {
           root: {
-            backgroundColor: isDark ? aetherColors.dark.surface : '#ffffff',
-            border: isDark ? `1px solid ${aetherColors.dark.border}` : 'none',
+            backgroundColor: '#ffffff',
+            border: '1px solid #e2e8f0',
+            boxShadow: '0 1px 3px rgba(0, 0, 0, 0.05)',
           },
         },
       },
@@ -287,8 +291,8 @@ export const createAetherTheme = (mode: 'light' | 'dark' = 'dark'): Theme => {
   });
 };
 
-// Default theme (dark mode)
-export const theme = createAetherTheme('dark');
+// Default theme (light mode only)
+export const theme = createAetherTheme();
 
 // Export theme utilities
 export { aetherColors as colors };

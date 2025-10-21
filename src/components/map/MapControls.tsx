@@ -76,6 +76,28 @@ const MapControls: React.FC<MapControlsProps> = ({
               onClose={() => setDropdownOpen(false)}
               disabled={isControlDisabled}
               displayEmpty
+              sx={{
+                height: '40px',
+                transition: 'all 200ms ease-in-out',
+                '& .MuiSelect-select': {
+                  height: '40px',
+                  display: 'flex',
+                  alignItems: 'center',
+                  padding: '0 14px'
+                },
+                '&:hover': {
+                  backgroundColor: '#f8fafc',
+                  '& .MuiOutlinedInput-notchedOutline': {
+                    borderColor: '#cbd5e1'
+                  }
+                },
+                '&.Mui-focused': {
+                  '& .MuiOutlinedInput-notchedOutline': {
+                    borderColor: '#1e293b',
+                    borderWidth: '1px'
+                  }
+                }
+              }}
               renderValue={(value) => {
                 if (!value) {
                   return (

@@ -1,6 +1,5 @@
 import React from 'react';
 import { Box, Typography } from '@mui/material';
-import { TrendingUp, Grass } from '@mui/icons-material';
 
 interface HealthCardProps {
   healthPercentage?: number;
@@ -12,32 +11,22 @@ const HealthCard: React.FC<HealthCardProps> = ({
   trend = 'up'
 }) => {
   const [animatedPercentage, setAnimatedPercentage] = React.useState(0);
-  const [isVisible, setIsVisible] = React.useState(false);
 
   React.useEffect(() => {
-    // Animate the percentage when component mounts
     const timer = setTimeout(() => {
-      setIsVisible(true);
       setAnimatedPercentage(healthPercentage);
-    }, 300);
-
+    }, 100);
     return () => clearTimeout(timer);
   }, [healthPercentage]);
 
-  const getTrendColor = () => {
-    switch (trend) {
-      case 'up': return '#4caf50';
-      case 'down': return '#f44336';
-      default: return '#ff9800';
-    }
+  const getProgressColor = () => {
+    if (healthPercentage >= 70) return '#10b981';
+    if (healthPercentage >= 40) return '#f59e0b';
+    return '#ef4444';
   };
 
-  const getTrendIcon = () => {
-    switch (trend) {
-      case 'up': return '↗';
-      case 'down': return '↘';
-      default: return '→';
-    }
+  const getTrendChange = () => {
+    return trend === 'up' ? '+22%' : trend === 'down' ? '-22%' : '0%';
   };
 
   const getHealthAssessment = () => {
@@ -91,90 +80,109 @@ const HealthCard: React.FC<HealthCardProps> = ({
     return { direction: 'down', change: '-1.2%', color: '#dc2626' };
   };
 
+  const radius = 32;
+  const circumference = 2 * Math.PI * radius;
+  const strokeDasharray = circumference;
+  const strokeDashoffset = circumference - (animatedPercentage / 100) * circumference;
+  
   return (
-    <div className={`dashlet ${
-      healthPercentage >= 70 ? 'dashlet--success' : 
-      healthPercentage >= 40 ? 'dashlet--warning' : 
-      'dashlet--primary'
-    } animate-fade-in-up`}>
+    <Box
+      sx={{
+        width: 160,
+        height: 160,
+        backgroundColor: '#ffffff',
+        borderRadius: '8px',
+        border: 'none',
+        boxShadow: '0 2px 4px rgba(0, 0, 0, 0.06)',
+        display: 'flex',
+        flexDirection: 'column',
+        alignItems: 'center',
+        justifyContent: 'center',
+        padding: 2,
+        transition: 'all 0.2s ease',
+        '&:hover': {
+          backgroundColor: '#fafafa',
+          transform: 'translateY(-2px)',
+          boxShadow: '0 4px 8px rgba(0, 0, 0, 0.08)'
+        }
+      }}
+    >
       {/* Header */}
-      <div className="dashlet-header">
-        <h3 className="dashlet-title">Health</h3>
-        <Box display="flex" alignItems="center" gap={0.5}>
-          <Grass className="dashlet-icon" sx={{ color: getHealthAssessment().color }} />
-          <span className={`status-indicator ${
-            healthPercentage >= 85 ? 'status-best-match' : 
-            healthPercentage >= 70 ? 'status-good-match' : 
-            healthPercentage >= 50 ? 'status-fair-match' :
-            healthPercentage >= 30 ? 'status-bad-match' : 'status-critical-match'
-          }`}>
-            {getHealthAssessment().status}
-          </span>
-        </Box>
-      </div>
+      <Typography
+        variant="caption"
+        sx={{
+          fontSize: '12px',
+          color: '#6b7280',
+          fontWeight: 500,
+          textAlign: 'center',
+          mb: 1
+        }}
+      >
+        Health
+      </Typography>
 
-      {/* Simplified Layout */}
-      <Box display="flex" alignItems="center" justifyContent="space-between" flex={1}>
-        {/* Advanced Circular Progress */}
-        <div 
-          className="progress-circular"
-          style={{
-            background: getProgressGradient(),
-            boxShadow: `0 0 0 2px ${getHealthAssessment().color}20`
-          }}
+      {/* Circular Progress */}
+      <Box position="relative" display="flex" alignItems="center" justifyContent="center" mb={1}>
+        <svg width="70" height="70" viewBox="0 0 70 70">
+          {/* Background Circle */}
+          <circle
+            cx="35"
+            cy="35"
+            r={radius}
+            fill="none"
+            stroke="#f3f4f6"
+            strokeWidth="3"
+          />
+          {/* Progress Circle */}
+          <circle
+            cx="35"
+            cy="35"
+            r={radius}
+            fill="none"
+            stroke={getProgressColor()}
+            strokeWidth="3"
+            strokeLinecap="round"
+            strokeDasharray={strokeDasharray}
+            strokeDashoffset={strokeDashoffset}
+            transform="rotate(-90 35 35)"
+            style={{
+              transition: 'stroke-dashoffset 0.6s ease-in-out',
+            }}
+          />
+        </svg>
+        {/* Center Value */}
+        <Box
+          position="absolute"
+          display="flex"
+          alignItems="center"
+          justifyContent="center"
         >
-          <div 
-            className="progress-value"
-            style={{ color: getHealthAssessment().color }}
-          >
-            {Math.round(animatedPercentage)}%
-          </div>
-        </div>
-
-        {/* Executive Intelligence Section */}
-        <Box flex={1} ml={2} display="flex" flexDirection="column" justifyContent="center">
-          {/* Advanced Trend Analysis */}
-          <Box display="flex" alignItems="center" gap={0.5} mb={1}>
-            <TrendingUp sx={{ 
-              color: getTrendIndicator().color, 
-              fontSize: 16
-            }} />
-            <Typography 
-              variant="caption" 
-              sx={{ 
-                color: getTrendIndicator().color,
-                fontWeight: 600,
-                fontSize: '12px'
-              }}
-            >
-              {getTrendIndicator().change}
-            </Typography>
-            <Typography 
-              variant="caption" 
-              sx={{ 
-                color: '#64748b',
-                fontSize: '11px'
-              }}
-            >
-              vs last week
-            </Typography>
-          </Box>
-
-          {/* Intelligent Insight */}
-          <Typography 
-            variant="caption" 
-            sx={{ 
-              color: '#475569',
-              fontSize: '12px',
-              fontWeight: 500,
-              lineHeight: 1.3
+          <Typography
+            variant="h4"
+            sx={{
+              fontWeight: 700,
+              fontSize: '28px',
+              color: '#1a1a1a',
+              lineHeight: 1,
             }}
           >
-            {getHealthAssessment().insight}
+            {Math.round(animatedPercentage)}%
           </Typography>
         </Box>
       </Box>
-    </div>
+
+      {/* Trend */}
+      <Typography
+        variant="caption"
+        sx={{
+          fontSize: '12px',
+          color: getProgressColor(),
+          fontWeight: 500,
+        }}
+      >
+        {getTrendChange()}
+      </Typography>
+    </Box>
   );
 };
 

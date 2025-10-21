@@ -88,7 +88,7 @@ const WeatherSidebar: React.FC<WeatherSidebarProps> = ({ selectedField }) => {
         justifyContent: 'center',
         p: 4,
         textAlign: 'center',
-        backgroundColor: '#f8fafc'
+        backgroundColor: '#ffffff'
       }}>
         <Typography variant="h6" sx={{ 
           color: '#475569', 
@@ -114,75 +114,100 @@ const WeatherSidebar: React.FC<WeatherSidebarProps> = ({ selectedField }) => {
       height: '100%', 
       display: 'flex', 
       flexDirection: 'column',
-      backgroundColor: '#f8fafc',
-      borderLeft: '1px solid #e2e8f0'
+      backgroundColor: '#ffffff',
+      borderLeft: '2px solid #e2e8f0',
+      boxShadow: '-2px 0 8px rgba(0, 0, 0, 0.04)'
     }}>
-      {/* Sophisticated Executive Header */}
+      {/* Professional Government Header */}
       <Box sx={{ 
         backgroundColor: '#ffffff',
-        borderBottom: '1px solid #e2e8f0'
+        borderBottom: '2px solid #e2e8f0',
+        boxShadow: '0 1px 3px rgba(0, 0, 0, 0.05)'
       }}>
-        {/* Primary Header */}
+        {/* Compact Professional Header */}
         <Box sx={{ 
-          p: 3, 
-          paddingBottom: 2
+          px: 3, 
+          py: 2
         }}>
-          <Box display="flex" justifyContent="space-between" alignItems="flex-start">
+          <Box display="flex" justifyContent="space-between" alignItems="center">
             <Box flex={1}>
-              <Box display="flex" alignItems="center" gap={2} mb={1}>
-                <Typography variant="h5" sx={{ 
-                  color: '#0f172a', 
+              <Box display="flex" alignItems="center" gap={2} mb={0.5}>
+                <Typography variant="h6" sx={{ 
+                  color: '#1e293b', 
                   fontWeight: 700,
-                  fontSize: '20px',
-                  letterSpacing: '-0.025em',
-                  lineHeight: 1.2
+                  fontSize: '16px',
+                  letterSpacing: '0.25px',
+                  textTransform: 'uppercase',
+                  lineHeight: 1
                 }}>
-                  {selectedField?.name || 'Field Dashboard'}
+                  {selectedField?.name || 'Field Intelligence'}
                 </Typography>
                 {selectedField && (
                   <span className={`status-indicator ${
                     selectedField.field_status === 'active' ? 'status-best-match' : 'status-good-match'
                   }`} style={{ 
-                    fontSize: '11px',
-                    padding: '4px 8px',
-                    fontWeight: 600
+                    fontSize: '10px',
+                    padding: '3px 6px',
+                    fontWeight: 600,
+                    borderRadius: '3px'
                   }}>
-                    {selectedField.field_status}
+                    {selectedField.field_status.toUpperCase()}
                   </span>
                 )}
               </Box>
               
               {selectedField && (
-                <Typography variant="body2" sx={{ 
-                  color: '#64748b',
-                  fontSize: '14px',
-                  fontWeight: 500
-                }}>
-                  {selectedField.area.toFixed(1)} hectares
-                </Typography>
+                <Box display="flex" alignItems="center" gap={2}>
+                  <Typography variant="caption" sx={{ 
+                    color: '#64748b',
+                    fontSize: '11px',
+                    fontWeight: 500
+                  }}>
+                    Area: {selectedField.area.toFixed(1)} ha
+                  </Typography>
+                  <Box sx={{ height: 10, width: '1px', backgroundColor: '#e2e8f0' }} />
+                  <Typography variant="caption" sx={{ 
+                    color: '#64748b',
+                    fontSize: '11px',
+                    fontWeight: 500
+                  }}>
+                    ID: {selectedField.id}
+                  </Typography>
+                </Box>
               )}
             </Box>
             
-            <Box display="flex" alignItems="center" gap={1}>
-              <Box 
-                sx={{
-                  width: 8,
-                  height: 8,
-                  borderRadius: '50%',
-                  backgroundColor: loading ? '#f59e0b' : '#059669',
-                  boxShadow: loading ? '0 0 0 3px rgba(245, 158, 11, 0.2)' : '0 0 0 3px rgba(5, 150, 105, 0.2)',
-                  transition: 'all 0.2s ease'
-                }}
-              />
+            <Box display="flex" alignItems="center" gap={2}>
+              <Box display="flex" alignItems="center" gap={1}>
+                <Box 
+                  sx={{
+                    width: 6,
+                    height: 6,
+                    borderRadius: '50%',
+                    backgroundColor: loading ? '#d97706' : '#059669',
+                    boxShadow: loading ? '0 0 0 2px rgba(217, 119, 6, 0.2)' : '0 0 0 2px rgba(5, 150, 105, 0.2)'
+                  }}
+                />
+                <Typography variant="caption" sx={{ 
+                  color: '#475569',
+                  fontSize: '10px',
+                  fontWeight: 500,
+                  textTransform: 'uppercase',
+                  letterSpacing: '0.5px'
+                }}>
+                  {loading ? 'Updating' : 'Live'}
+                </Typography>
+              </Box>
               <IconButton 
                 onClick={handleRefresh} 
                 disabled={loading}
                 size="small"
                 sx={{ 
                   color: '#64748b',
-                  padding: '8px',
+                  padding: '4px',
                   backgroundColor: '#f8fafc',
                   border: '1px solid #e2e8f0',
+                  borderRadius: '4px',
                   '&:hover': {
                     backgroundColor: '#f1f5f9',
                     color: '#334155',
@@ -193,73 +218,27 @@ const WeatherSidebar: React.FC<WeatherSidebarProps> = ({ selectedField }) => {
                   }
                 }}
               >
-                {loading ? <CircularProgress size={16} sx={{ color: '#3b82f6' }} /> : <Refresh fontSize="small" />}
+                {loading ? <CircularProgress size={12} sx={{ color: '#475569' }} /> : <Refresh sx={{ fontSize: 12 }} />}
               </IconButton>
             </Box>
           </Box>
         </Box>
-
-        {/* Key Metrics Strip */}
-        {selectedField && !loading && (
-          <Box sx={{ 
-            px: 3, 
-            pb: 2,
-            borderTop: '1px solid #f1f5f9'
-          }}>
-            <Box display="flex" alignItems="center" gap={3} mt={2}>
-              <Box display="flex" alignItems="center" gap={1}>
-                <Box sx={{ 
-                  width: 6, 
-                  height: 6, 
-                  borderRadius: '50%', 
-                  backgroundColor: '#059669' 
-                }} />
-                <Typography variant="caption" sx={{ 
-                  color: '#475569',
-                  fontSize: '12px',
-                  fontWeight: 500
-                }}>
-                  Live Data
-                </Typography>
-              </Box>
-              
-              <Box display="flex" alignItems="center" gap={1}>
-                <Typography variant="caption" sx={{ 
-                  color: '#64748b',
-                  fontSize: '11px'
-                }}>
-                  Updated: Just now
-                </Typography>
-              </Box>
-
-              <Box display="flex" alignItems="center" gap={1}>
-                <Typography variant="caption" sx={{ 
-                  color: '#64748b',
-                  fontSize: '11px'
-                }}>
-                  7 metrics
-                </Typography>
-              </Box>
-            </Box>
-          </Box>
-        )}
       </Box>
 
-      {/* Content */}
+      {/* Professional Data Content */}
       <Box sx={{ 
         flex: 1, 
         overflow: 'auto',
-        p: 2,
         backgroundColor: '#f8fafc',
         '&::-webkit-scrollbar': {
-          width: '6px',
+          width: '4px',
         },
         '&::-webkit-scrollbar-track': {
-          backgroundColor: '#f1f5f9',
+          backgroundColor: 'transparent',
         },
         '&::-webkit-scrollbar-thumb': {
           backgroundColor: '#cbd5e1',
-          borderRadius: '4px',
+          borderRadius: '2px',
           '&:hover': {
             backgroundColor: '#94a3b8'
           }
@@ -287,226 +266,317 @@ const WeatherSidebar: React.FC<WeatherSidebarProps> = ({ selectedField }) => {
             {error}
           </Alert>
         ) : (
-          <Box sx={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
-            {/* Agricultural Intelligence Group */}
-            <Box>
+          <Box sx={{ display: 'flex', flexDirection: 'column' }}>
+            {/* Professional Data Table - Agricultural Intelligence */}
+            <Box sx={{ 
+              borderBottom: '1px solid #e2e8f0',
+              backgroundColor: '#ffffff'
+            }}>
               <Box sx={{ 
-                mb: 3,
-                pb: 2,
-                borderBottom: '2px solid #f1f5f9',
-                background: 'linear-gradient(135deg, rgba(5, 150, 105, 0.03) 0%, rgba(16, 185, 129, 0.02) 100%)',
-                borderRadius: '12px 12px 0 0',
-                px: 2,
+                px: 3,
                 py: 2,
-                mx: -1
+                borderBottom: '1px solid #f1f5f9',
+                backgroundColor: '#f8fafc'
               }}>
-                <Typography variant="h6" sx={{ 
-                  color: '#059669',
-                  fontSize: '15px',
-                  fontWeight: 800,
-                  letterSpacing: '0.02em',
+                <Typography variant="subtitle2" sx={{ 
+                  color: '#1e293b',
+                  fontSize: '12px',
+                  fontWeight: 700,
                   textTransform: 'uppercase',
+                  letterSpacing: '0.5px',
                   display: 'flex',
                   alignItems: 'center',
-                  gap: 1.5,
-                  mb: 0.5
+                  gap: 1
                 }}>
                   <Box sx={{ 
-                    width: 4, 
-                    height: 16, 
+                    width: 3, 
+                    height: 12, 
                     backgroundColor: '#059669',
-                    borderRadius: '3px',
-                    boxShadow: '0 0 8px rgba(5, 150, 105, 0.3)'
+                    borderRadius: '2px'
                   }} />
                   Agricultural Intelligence
                 </Typography>
-                <Typography variant="caption" sx={{ 
-                  color: '#475569',
-                  fontSize: '12px',
-                  fontWeight: 600,
-                  lineHeight: 1.4
-                }}>
-                  AI-powered field health, soil conditions, and crop environment analysis
-                </Typography>
               </Box>
-              <Box 
-                sx={{
-                  display: 'grid',
-                  gridTemplateColumns: '1fr 1fr',
-                  gap: 2.5,
-                  px: 1,
-                  pb: 1,
-                  '& .dashlet': {
-                    opacity: 0,
-                    animation: 'fadeInUp 0.5s cubic-bezier(0.4, 0.0, 0.2, 1) forwards',
-                    transform: 'translateY(20px)',
-                    boxShadow: '0 4px 20px rgba(0, 0, 0, 0.06), 0 1px 3px rgba(0, 0, 0, 0.1)',
-                    transition: 'all 0.3s cubic-bezier(0.4, 0.0, 0.2, 1)',
-                    '&:hover': {
-                      transform: 'translateY(-4px)',
-                      boxShadow: '0 12px 40px rgba(0, 0, 0, 0.12), 0 4px 12px rgba(0, 0, 0, 0.15)'
-                    }
-                  },
-                  '& .dashlet:nth-of-type(1)': { animationDelay: '100ms' },
-                  '& .dashlet:nth-of-type(2)': { animationDelay: '200ms' },
-                  '& .dashlet:nth-of-type(3)': { animationDelay: '300ms' },
-                  '@media (max-width: 600px)': {
-                    gridTemplateColumns: '1fr',
-                    gap: 2,
-                    px: 0
-                  }
-                }}
-              >
-                <HealthCard />
-                <MoistureCard currentSoil={soilData || undefined} />
-                <UVIndexCard currentUVI={uviData || undefined} />
+              
+              {/* Data Table */}
+              <Box sx={{ px: 3, py: 2 }}>
+                <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1.5 }}>
+                  <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                    <Typography variant="body2" sx={{ 
+                      color: '#475569', 
+                      fontSize: '12px',
+                      fontWeight: 500
+                    }}>
+                      Field Health Index
+                    </Typography>
+                    <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                      <Typography variant="body2" sx={{ 
+                        color: '#1e293b', 
+                        fontSize: '14px',
+                        fontWeight: 700
+                      }}>
+                        42%
+                      </Typography>
+                      <Box sx={{ 
+                        px: 1.5, 
+                        py: 0.5, 
+                        backgroundColor: '#fef3c7',
+                        borderRadius: '4px',
+                        border: '1px solid #fbbf24'
+                      }}>
+                        <Typography variant="caption" sx={{ 
+                          color: '#92400e', 
+                          fontSize: '9px',
+                          fontWeight: 600,
+                          textTransform: 'uppercase'
+                        }}>
+                          Fair
+                        </Typography>
+                      </Box>
+                    </Box>
+                  </Box>
+                  
+                  <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                    <Typography variant="body2" sx={{ 
+                      color: '#475569', 
+                      fontSize: '12px',
+                      fontWeight: 500
+                    }}>
+                      Soil Moisture
+                    </Typography>
+                    <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                      <Typography variant="body2" sx={{ 
+                        color: '#1e293b', 
+                        fontSize: '14px',
+                        fontWeight: 700
+                      }}>
+                        {soilData ? `${(soilData.moisture * 100).toFixed(0)}%` : '11%'}
+                      </Typography>
+                      <Box sx={{ 
+                        px: 1.5, 
+                        py: 0.5, 
+                        backgroundColor: '#fecaca',
+                        borderRadius: '4px',
+                        border: '1px solid #ef4444'
+                      }}>
+                        <Typography variant="caption" sx={{ 
+                          color: '#991b1b', 
+                          fontSize: '9px',
+                          fontWeight: 600,
+                          textTransform: 'uppercase'
+                        }}>
+                          Low
+                        </Typography>
+                      </Box>
+                    </Box>
+                  </Box>
+                </Box>
               </Box>
             </Box>
 
-            {/* Environmental Conditions Group */}
-            <Box>
+            {/* Professional Data Table - Environmental Conditions */}
+            <Box sx={{ 
+              borderBottom: '1px solid #e2e8f0',
+              backgroundColor: '#ffffff'
+            }}>
               <Box sx={{ 
-                mb: 3,
-                pb: 2,
-                borderBottom: '2px solid #f1f5f9',
-                background: 'linear-gradient(135deg, rgba(8, 145, 178, 0.03) 0%, rgba(14, 165, 233, 0.02) 100%)',
-                borderRadius: '12px 12px 0 0',
-                px: 2,
+                px: 3,
                 py: 2,
-                mx: -1
+                borderBottom: '1px solid #f1f5f9',
+                backgroundColor: '#f8fafc'
               }}>
-                <Typography variant="h6" sx={{ 
-                  color: '#0891b2',
-                  fontSize: '15px',
-                  fontWeight: 800,
-                  letterSpacing: '0.02em',
+                <Typography variant="subtitle2" sx={{ 
+                  color: '#1e293b',
+                  fontSize: '12px',
+                  fontWeight: 700,
                   textTransform: 'uppercase',
+                  letterSpacing: '0.5px',
                   display: 'flex',
                   alignItems: 'center',
-                  gap: 1.5,
-                  mb: 0.5
+                  gap: 1
                 }}>
                   <Box sx={{ 
-                    width: 4, 
-                    height: 16, 
-                    backgroundColor: '#0891b2',
-                    borderRadius: '3px',
-                    boxShadow: '0 0 8px rgba(8, 145, 178, 0.3)'
+                    width: 3, 
+                    height: 12, 
+                    backgroundColor: '#0f766e',
+                    borderRadius: '2px'
                   }} />
                   Environmental Conditions
                 </Typography>
-                <Typography variant="caption" sx={{ 
-                  color: '#475569',
-                  fontSize: '12px',
-                  fontWeight: 600,
-                  lineHeight: 1.4
-                }}>
-                  Real-time weather data and atmospheric monitoring systems
-                </Typography>
               </Box>
-              <Box 
-                sx={{
-                  display: 'grid',
-                  gridTemplateColumns: '1fr 1fr',
-                  gap: 2.5,
-                  px: 1,
-                  pb: 1,
-                  '& .dashlet': {
-                    opacity: 0,
-                    animation: 'fadeInUp 0.5s cubic-bezier(0.4, 0.0, 0.2, 1) forwards',
-                    transform: 'translateY(20px)',
-                    boxShadow: '0 4px 20px rgba(0, 0, 0, 0.06), 0 1px 3px rgba(0, 0, 0, 0.1)',
-                    transition: 'all 0.3s cubic-bezier(0.4, 0.0, 0.2, 1)',
-                    '&:hover': {
-                      transform: 'translateY(-4px)',
-                      boxShadow: '0 12px 40px rgba(0, 0, 0, 0.12), 0 4px 12px rgba(0, 0, 0, 0.15)'
-                    }
-                  },
-                  '& .dashlet:nth-of-type(1)': { animationDelay: '400ms' },
-                  '& .dashlet:nth-of-type(2)': { animationDelay: '500ms' },
-                  '& .dashlet:nth-of-type(3)': { animationDelay: '600ms' },
-                  '@media (max-width: 600px)': {
-                    gridTemplateColumns: '1fr',
-                    gap: 2,
-                    px: 0
-                  }
-                }}
-              >
-                <TemperatureCard weatherData={weatherData || undefined} />
-                <HumidityCard weatherData={weatherData || undefined} />
-                <PressureCard weatherData={weatherData || undefined} />
+              
+              {/* Professional Data Grid */}
+              <Box sx={{ px: 3, py: 2 }}>
+                <Box sx={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 2, mb: 2 }}>
+                  <Box sx={{ display: 'flex', flexDirection: 'column', gap: 0.5 }}>
+                    <Typography variant="caption" sx={{ 
+                      color: '#64748b', 
+                      fontSize: '10px',
+                      fontWeight: 500,
+                      textTransform: 'uppercase',
+                      letterSpacing: '0.5px'
+                    }}>
+                      Temperature
+                    </Typography>
+                    <Typography variant="h6" sx={{ 
+                      color: '#1e293b', 
+                      fontSize: '16px',
+                      fontWeight: 700,
+                      lineHeight: 1
+                    }}>
+                      {weatherData ? `${(weatherData.main.temp - 273.15).toFixed(0)}°C` : '25°C'}
+                    </Typography>
+                  </Box>
+                  
+                  <Box sx={{ display: 'flex', flexDirection: 'column', gap: 0.5 }}>
+                    <Typography variant="caption" sx={{ 
+                      color: '#64748b', 
+                      fontSize: '10px',
+                      fontWeight: 500,
+                      textTransform: 'uppercase',
+                      letterSpacing: '0.5px'
+                    }}>
+                      Humidity
+                    </Typography>
+                    <Typography variant="h6" sx={{ 
+                      color: '#1e293b', 
+                      fontSize: '16px',
+                      fontWeight: 700,
+                      lineHeight: 1
+                    }}>
+                      {weatherData ? `${weatherData.main.humidity}%` : '25%'}
+                    </Typography>
+                  </Box>
+                </Box>
+                
+                <Box sx={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 2 }}>
+                  <Box sx={{ display: 'flex', flexDirection: 'column', gap: 0.5 }}>
+                    <Typography variant="caption" sx={{ 
+                      color: '#64748b', 
+                      fontSize: '10px',
+                      fontWeight: 500,
+                      textTransform: 'uppercase',
+                      letterSpacing: '0.5px'
+                    }}>
+                      Wind Speed
+                    </Typography>
+                    <Typography variant="h6" sx={{ 
+                      color: '#1e293b', 
+                      fontSize: '16px',
+                      fontWeight: 700,
+                      lineHeight: 1
+                    }}>
+                      {weatherData ? `${weatherData.wind.speed} m/s` : '0.91 m/s'}
+                    </Typography>
+                  </Box>
+                  
+                  <Box sx={{ display: 'flex', flexDirection: 'column', gap: 0.5 }}>
+                    <Typography variant="caption" sx={{ 
+                      color: '#64748b', 
+                      fontSize: '10px',
+                      fontWeight: 500,
+                      textTransform: 'uppercase',
+                      letterSpacing: '0.5px'
+                    }}>
+                      Pressure
+                    </Typography>
+                    <Typography variant="h6" sx={{ 
+                      color: '#1e293b', 
+                      fontSize: '16px',
+                      fontWeight: 700,
+                      lineHeight: 1
+                    }}>
+                      {weatherData ? `${weatherData.main.pressure} hPa` : '1012 hPa'}
+                    </Typography>
+                  </Box>
+                </Box>
               </Box>
             </Box>
 
-            {/* Operational Conditions Group */}
-            <Box>
+            {/* Additional System Information */}
+            <Box sx={{ 
+              backgroundColor: '#ffffff',
+              borderBottom: '1px solid #e2e8f0'
+            }}>
               <Box sx={{ 
-                mb: 3,
-                pb: 2,
-                borderBottom: '2px solid #f1f5f9',
-                background: 'linear-gradient(135deg, rgba(217, 119, 6, 0.03) 0%, rgba(245, 158, 11, 0.02) 100%)',
-                borderRadius: '12px 12px 0 0',
-                px: 2,
+                px: 3,
                 py: 2,
-                mx: -1
+                borderBottom: '1px solid #f1f5f9',
+                backgroundColor: '#f8fafc'
               }}>
-                <Typography variant="h6" sx={{ 
-                  color: '#d97706',
-                  fontSize: '15px',
-                  fontWeight: 800,
-                  letterSpacing: '0.02em',
+                <Typography variant="subtitle2" sx={{ 
+                  color: '#1e293b',
+                  fontSize: '12px',
+                  fontWeight: 700,
                   textTransform: 'uppercase',
+                  letterSpacing: '0.5px',
                   display: 'flex',
                   alignItems: 'center',
-                  gap: 1.5,
-                  mb: 0.5
+                  gap: 1
                 }}>
                   <Box sx={{ 
-                    width: 4, 
-                    height: 16, 
-                    backgroundColor: '#d97706',
-                    borderRadius: '3px',
-                    boxShadow: '0 0 8px rgba(217, 119, 6, 0.3)'
+                    width: 3, 
+                    height: 12, 
+                    backgroundColor: '#475569',
+                    borderRadius: '2px'
                   }} />
-                  Operational Conditions
-                </Typography>
-                <Typography variant="caption" sx={{ 
-                  color: '#475569',
-                  fontSize: '12px',
-                  fontWeight: 600,
-                  lineHeight: 1.4
-                }}>
-                  Field operations and optimal working conditions analysis
+                  System Status
                 </Typography>
               </Box>
-              <Box 
-                sx={{
-                  display: 'grid',
-                  gridTemplateColumns: '1fr',
-                  gap: 2.5,
-                  px: 1,
-                  pb: 1,
-                  '& .dashlet': {
-                    opacity: 0,
-                    animation: 'fadeInUp 0.5s cubic-bezier(0.4, 0.0, 0.2, 1) forwards',
-                    transform: 'translateY(20px)',
-                    boxShadow: '0 4px 20px rgba(0, 0, 0, 0.06), 0 1px 3px rgba(0, 0, 0, 0.1)',
-                    transition: 'all 0.3s cubic-bezier(0.4, 0.0, 0.2, 1)',
-                    '&:hover': {
-                      transform: 'translateY(-4px)',
-                      boxShadow: '0 12px 40px rgba(0, 0, 0, 0.12), 0 4px 12px rgba(0, 0, 0, 0.15)'
-                    }
-                  },
-                  '& .dashlet:nth-of-type(1)': { animationDelay: '700ms' },
-                  '@media (max-width: 600px)': {
-                    gap: 2,
-                    px: 0
-                  }
-                }}
-              >
-                <WindCard weatherData={weatherData || undefined} />
+              
+              <Box sx={{ px: 3, py: 2 }}>
+                <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1 }}>
+                  <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                    <Typography variant="body2" sx={{ 
+                      color: '#475569', 
+                      fontSize: '12px',
+                      fontWeight: 500
+                    }}>
+                      Last Updated
+                    </Typography>
+                    <Typography variant="body2" sx={{ 
+                      color: '#1e293b', 
+                      fontSize: '12px',
+                      fontWeight: 600
+                    }}>
+                      {new Date().toLocaleTimeString('en-US', { 
+                        hour: '2-digit', 
+                        minute: '2-digit',
+                        second: '2-digit',
+                        hour12: false 
+                      })}
+                    </Typography>
+                  </Box>
+                  
+                  <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                    <Typography variant="body2" sx={{ 
+                      color: '#475569', 
+                      fontSize: '12px',
+                      fontWeight: 500
+                    }}>
+                      Data Quality
+                    </Typography>
+                    <Box sx={{ 
+                      px: 1.5, 
+                      py: 0.5, 
+                      backgroundColor: '#dcfce7',
+                      borderRadius: '4px',
+                      border: '1px solid #16a34a'
+                    }}>
+                      <Typography variant="caption" sx={{ 
+                        color: '#166534', 
+                        fontSize: '9px',
+                        fontWeight: 600,
+                        textTransform: 'uppercase'
+                      }}>
+                        Excellent
+                      </Typography>
+                    </Box>
+                  </Box>
+                </Box>
               </Box>
             </Box>
+
           </Box>
         )}
       </Box>

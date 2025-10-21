@@ -114,10 +114,10 @@ const CustomMapControls: React.FC<CustomMapControlsProps> = ({ className }) => {
           flexDirection: 'row',
           gap: 0,
           padding: 0,
-          background: 'var(--glass-dark-heavy)',
-          backdropFilter: 'blur(24px)',
+          background: '#ffffff',
+          boxShadow: '0 2px 8px rgba(0, 0, 0, 0.08)',
           borderRadius: '8px',
-          border: '1px solid rgba(255, 255, 255, 0.1)',
+          border: '1px solid rgba(0, 0, 0, 0.08)',
           overflow: 'hidden',
         }}
       >
@@ -126,13 +126,14 @@ const CustomMapControls: React.FC<CustomMapControlsProps> = ({ className }) => {
             onClick={handleZoomIn}
             size="small"
             sx={{ 
-              color: 'white',
+              color: '#64748b',
               borderRadius: 0,
-              padding: '8px',
+              padding: '6px',
               '&:hover': {
-                backgroundColor: 'rgba(255, 255, 255, 0.1)',
+                backgroundColor: '#f8f9fa',
+                color: '#0f172a'
               },
-              borderRight: '1px solid rgba(255, 255, 255, 0.1)',
+              borderRight: '1px solid rgba(0, 0, 0, 0.08)',
             }}
           >
             <Add fontSize="small" />
@@ -144,12 +145,14 @@ const CustomMapControls: React.FC<CustomMapControlsProps> = ({ className }) => {
             onClick={handleZoomOut}
             size="small"
             sx={{ 
-              color: 'white',
+              color: '#64748b',
               borderRadius: 0,
-              padding: '8px',
+              padding: '6px',
               '&:hover': {
-                backgroundColor: 'rgba(255, 255, 255, 0.1)',
+                backgroundColor: '#f8f9fa',
+                color: '#0f172a'
               },
+              borderRight: '1px solid rgba(0, 0, 0, 0.08)',
             }}
           >
             <Remove fontSize="small" />
@@ -161,11 +164,12 @@ const CustomMapControls: React.FC<CustomMapControlsProps> = ({ className }) => {
             onClick={handleFullscreen}
             size="small"
             sx={{ 
-              color: 'white',
+              color: '#64748b',
               borderRadius: 0,
-              padding: '8px',
+              padding: '6px',
               '&:hover': {
-                backgroundColor: 'rgba(255, 255, 255, 0.1)',
+                backgroundColor: '#f8f9fa',
+                color: '#0f172a'
               },
             }}
           >
