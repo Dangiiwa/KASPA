@@ -3,7 +3,8 @@ import { store } from '../redux/store';
 import { logout } from '../redux/slices/userSlice';
 import { enqueueSnackbar } from 'notistack';
 
-export const baseURL = import.meta.env.VITE_APP_BASE_URL;
+export const baseURL = import.meta.env.VITE_APP_BASE_URL || 'https://api-aetherview.com/api';
+console.log('Base URL:', baseURL, 'Env:', import.meta.env.VITE_APP_BASE_URL);
 
 const $axios = axios.create({
   baseURL,
