@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { 
   AppBar, 
   Toolbar, 
@@ -45,10 +45,29 @@ const Dashboard: React.FC = () => {
   const [drawnPolygon, setDrawnPolygon] = useState<GeoJSON | null>(null);
   const [polygonArea, setPolygonArea] = useState<number | null>(null);
   const [previousSelectedField, setPreviousSelectedField] = useState<Field | null>(null);
+  const [pendingNewFarmName, setPendingNewFarmName] = useState<string | null>(null);
 
   const handleLogout = () => {
     dispatch(logout());
   };
+  
+  // Auto-select newly created farm when fields update
+  useEffect(() => {
+    if (pendingNewFarmName && fields.length > 0 && !loading) {
+      console.log('🔍 Checking for newly created farm:', pendingNewFarmName);
+      console.log('📋 Available fields:', fields.map(f => f.name));
+      
+      const newFarm = fields.find(field => field.name === pendingNewFarmName);
+      if (newFarm) {
+        console.log('✅ Found newly created farm, selecting it:', newFarm);
+        selectField(newFarm);
+        setPendingNewFarmName(null); // Clear pending state
+        enqueueSnackbar(`Now viewing ${newFarm.name} with NDVI data`, { variant: 'info' });
+      } else {
+        console.log('❌ Newly created farm not found in fields list yet');
+      }
+    }
+  }, [fields, pendingNewFarmName, loading, selectField]);
 
   const handleFieldSelect = (field: Field) => {
     selectField(field);
@@ -106,9 +125,9 @@ const Dashboard: React.FC = () => {
   const handleCreateFarm = async (farmData: { name: string; field_status: 'unplanted' | 'active'; geo_json: GeoJSON }) => {
     try {
       await dispatch(createFarm(farmData)).unwrap();
-      enqueueSnackbar('Farm created successfully!', { variant: 'success' });
+      console.log('✅ Farm created successfully:', farmData.name);
       
-      // Reset creation state
+      // Reset creation state first
       setIsCreatingFarm(false);
       setIsDrawingMode(false);
       setDrawnPolygon(null);
@@ -117,7 +136,14 @@ const Dashboard: React.FC = () => {
       dispatch(clearCreateError());
       
       // Refresh fields list to include the new farm
-      fetchFields();
+      console.log('🔄 Refreshing fields list...');
+      await fetchFields();
+      
+      // Set pending farm name for auto-selection after fields update
+      setPendingNewFarmName(farmData.name);
+      console.log('🎯 Set pending new farm for auto-selection:', farmData.name);
+      
+      enqueueSnackbar('Farm created successfully!', { variant: 'success' });
     } catch (error: any) {
       enqueueSnackbar(error || 'Failed to create farm', { variant: 'error' });
     }

@@ -134,7 +134,7 @@ const LeafletDrawControls: React.FC<LeafletDrawControlsProps> = ({
     const setupGeomanEvents = () => {
       console.log('🎧 Setting up Geoman event listeners...');
       
-      // Try BOTH map.on() and map.pm.on() approaches
+      // Try ONLY map.on() approach
       const setupMethod1 = () => {
         console.log('📡 Method 1: Using map.on() for Geoman events');
         
@@ -143,20 +143,6 @@ const LeafletDrawControls: React.FC<LeafletDrawControlsProps> = ({
             console.log('🎯 METHOD 1: pm:create event fired!', e);
             handlePolygonCreate(e);
           });
-        };
-        
-        const setupMethod2 = () => {
-          console.log('📡 Method 2: Using map.pm.on() for Geoman events');
-          
-          // Alternative approach using map.pm.on()
-          if (map.pm && typeof map.pm.on === 'function') {
-            map.pm.on('pm:create', (e: any) => {
-              console.log('🎯 METHOD 2: pm:create event fired!', e);
-              handlePolygonCreate(e);
-            });
-          } else {
-            console.error('❌ map.pm.on is not available');
-          }
         };
         
         // Common polygon handling function
@@ -230,11 +216,10 @@ const LeafletDrawControls: React.FC<LeafletDrawControlsProps> = ({
           console.log('ℹ️ Drawing mode change will be handled by Dashboard after state settles');
         };
         
-        // Try both methods
+        // Try only method 1
         setupMethod1();
-        setupMethod2();
         
-        // Setup other events with both methods too
+        // Setup other events with only map.on() methods
         const setupOtherEvents = () => {
           // Standard events
           map.on('pm:drawstart', (e: any) => console.log('🎬 pm:drawstart - Drawing started', e));
@@ -248,13 +233,6 @@ const LeafletDrawControls: React.FC<LeafletDrawControlsProps> = ({
             }, 100);
           });
           map.on('pm:vertexadded', (e: any) => console.log('📍 pm:vertexadded - Point added to polygon', e));
-          
-          // Geoman-specific events if available
-          if (map.pm && typeof map.pm.on === 'function') {
-            map.pm.on('pm:drawstart', (e: any) => console.log('🎬 GEOMAN pm:drawstart', e));
-            map.pm.on('pm:drawend', (e: any) => console.log('🏁 GEOMAN pm:drawend', e));
-            map.pm.on('pm:vertexadded', (e: any) => console.log('📍 GEOMAN pm:vertexadded', e));
-          }
         };
         
         setupOtherEvents();
